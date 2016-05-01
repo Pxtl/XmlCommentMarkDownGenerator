@@ -21,8 +21,8 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.Test
             var xdoc = XDocument.Parse(testInput);
 
             var expectedOutput = normalizeSpace.Replace(FetchResourceAsString(outputResourceName), " ");
-            var actualOutput = normalizeSpace.Replace(xdoc.Root.ToMarkDown(), " ");
-            Assert.AreEqual(expectedOutput, actualOutput);
+            var actualOutput = normalizeSpace.Replace(xdoc.ToMarkDown(), " ");
+             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
         private static string FetchResourceAsString(string resourceName)

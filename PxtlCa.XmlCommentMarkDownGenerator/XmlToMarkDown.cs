@@ -13,6 +13,10 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
     {
         public static string ToMarkDown(this XNode e)
         {
+            if(e is XDocument)
+            {
+                e = ((XDocument)e).Root;
+            }
             var templates = new Dictionary<string, string>
                 {
                     {"doc", "# {0} #\n\n{1}\n\n"},
