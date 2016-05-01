@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -11,6 +12,18 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
 {
     public static class XmlToMarkdown
     {
+        public static string ToMarkDown(this string e)
+        {
+            var xdoc = XDocument.Parse(e);
+            return xdoc.ToMarkDown();
+        }
+
+        public static string ToMarkDown(this Stream e)
+        {
+            var xdoc = XDocument.Load(e);
+            return xdoc.ToMarkDown();
+        }
+
         public static string ToMarkDown(this XNode e)
         {
             if(e is XDocument)

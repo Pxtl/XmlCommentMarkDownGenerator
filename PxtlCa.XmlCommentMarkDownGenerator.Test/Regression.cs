@@ -18,10 +18,9 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.Test
             var outputResourceName = "PxtlCa.XmlCommentMarkDownGenerator.Test.RegressionBigVariant_output.md";
             Regex normalizeSpace = new Regex(@"\s+", RegexOptions.Compiled);
             var testInput = FetchResourceAsString(inputResourceName);
-            var xdoc = XDocument.Parse(testInput);
 
             var expectedOutput = normalizeSpace.Replace(FetchResourceAsString(outputResourceName), " ");
-            var actualOutput = normalizeSpace.Replace(xdoc.ToMarkDown(), " ");
+            var actualOutput = normalizeSpace.Replace(testInput.ToMarkDown(), " ");
              Assert.AreEqual(expectedOutput, actualOutput);
         }
 
