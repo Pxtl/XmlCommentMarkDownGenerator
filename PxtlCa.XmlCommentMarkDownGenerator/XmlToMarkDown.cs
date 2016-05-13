@@ -24,11 +24,11 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
             return xdoc.ToMarkDown();
         }
 
-        public static string ToMarkDown(this XNode e)
+        public static string ToMarkDown(this XNode node, string assemblyName = null)
         {
-            if(e is XDocument)
+            if(node is XDocument)
             {
-                e = ((XDocument)e).Root;
+                node = ((XDocument)node).Root;
             }
             var templates = new Dictionary<string, string>
                 {
@@ -49,38 +49,33 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
                     {"returns", "Returns: {0}\n\n"},
                     {"none", ""}
                 };
-            var d = new Func<string, XElement, string[]>((att, node) => new[]
-                {
-                    node.Attribute(att).Value,
-                    node.Nodes().ToMarkDown()
-                });
-            var methods = new Dictionary<string, Func<XElement, IEnumerable<string>>>
+            var valueExtractorsDict = new Dictionary<string, Func<XElement, IEnumerable<string>>>
                 {
                     {"doc", x=> new[]{
                         x.Element("assembly").Element("name").Value,
-                        x.Element("members").Elements("member").ToMarkDown()
+                        x.Element("members").Elements("member").ToMarkDown(x.Element("assembly").Element("name").Value)
                     }},
-                    {"type", x=>d("name", x)},
-                    {"field", x=> d("name", x)},
-                    {"property", x=> d("name", x)},
-                    {"method",x=>d("name", x)},
-                    {"event", x=>d("name", x)},
-                    {"summary", x=> new[]{ x.Nodes().ToMarkDown() }},
-                    {"remarks", x => new[]{x.Nodes().ToMarkDown()}},
-                    {"example", x => new[]{x.Nodes().ToMarkDown()}},
+                    {"type", x=>ExtractNameAndBodyFromMember("name", x, assemblyName)},
+                    {"field", x=> ExtractNameAndBodyFromMember("name", x, assemblyName)},
+                    {"property", x=> ExtractNameAndBodyFromMember("name", x, assemblyName)},
+                    {"method",x=>ExtractNameAndBodyFromMember("name", x, assemblyName)},
+                    {"event", x=>ExtractNameAndBodyFromMember("name", x, assemblyName)},
+                    {"summary", x=> new[]{ x.Nodes().ToMarkDown(assemblyName) }},
+                    {"remarks", x => new[]{x.Nodes().ToMarkDown(assemblyName) }},
+                    {"example", x => new[]{x.Nodes().ToMarkDown(assemblyName) }},
                     {"code", x => new[]{x.Attribute("lang")?.Value ?? "", x.Value.ToCodeBlock()}},
-                    {"seePage", x=> d("cref", x) },
-                    {"seeAnchor", x=> { var xx = d("cref", x); xx[0] = xx[0].ToLower(); return xx; }},
-                    {"param", x => d("name", x) },
-                    {"exception", x => d("cref", x) },
-                    {"returns", x => new[]{x.Nodes().ToMarkDown()}},
+                    {"seePage", x=> ExtractNameAndBody("cref", x, assemblyName) },
+                    {"seeAnchor", x=> { var xx = ExtractNameAndBody("cref", x, assemblyName); xx[0] = xx[0].ToLower(); return xx; }},
+                    {"param", x => ExtractNameAndBody("name", x, assemblyName) },
+                    {"exception", x => ExtractNameAndBody("cref", x, assemblyName) },
+                    {"returns", x => new[]{x.Nodes().ToMarkDown(assemblyName) }},
                     {"none", x => new string[0]}
                 };
 
             string name;
-            if (e.NodeType == XmlNodeType.Element)
+            if (node.NodeType == XmlNodeType.Element)
             {
-                var el = (XElement)e;
+                var el = (XElement)node;
                 name = el.Name.LocalName;
                 if (name == "member")
                 {
@@ -99,28 +94,37 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
                     var anchor = el.Attribute("cref").Value.StartsWith("!:#");
                     name = anchor ? "seeAnchor" : "seePage";
                 }
-                var vals = methods[name](el).ToArray();
-                string str = "";
-                switch (vals.Length)
-                {
-                    case 1: str = string.Format(templates[name], vals[0]); break;
-                    case 2: str = string.Format(templates[name], vals[0], vals[1]); break;
-                    case 3: str = string.Format(templates[name], vals[0], vals[1], vals[2]); break;
-                    case 4: str = string.Format(templates[name], vals[0], vals[1], vals[2], vals[3]); break;
-                }
-
-                return str;
+                var vals = valueExtractorsDict[name](el).ToArray();
+                return string.Format(templates[name], args: vals);
             }
 
-            if (e.NodeType == XmlNodeType.Text)
-                return Regex.Replace(((XText)e).Value.Replace('\n', ' '), @"\s+", " ");
+            if (node.NodeType == XmlNodeType.Text)
+                return Regex.Replace(((XText)node).Value.Replace('\n', ' '), @"\s+", " ");
 
             return "";
         }
 
-        internal static string ToMarkDown(this IEnumerable<XNode> es)
+        internal static string[] ExtractNameAndBodyFromMember(string att, XElement node, string assemblyName)
         {
-            return es.Aggregate("", (current, x) => current + x.ToMarkDown());
+            return new[]
+               {
+                    Regex.Replace(node.Attribute(att).Value, $@":{Regex.Escape(assemblyName)}\.", ":"), //remove leading namespace if it matches the assembly name
+                    node.Nodes().ToMarkDown(assemblyName)
+                };
+        }
+
+        internal static string[] ExtractNameAndBody(string att, XElement node, string assemblyName)
+        {
+            return new[]
+               {
+                    node.Attribute(att).Value,
+                    node.Nodes().ToMarkDown(assemblyName)
+                };
+        }
+
+        internal static string ToMarkDown(this IEnumerable<XNode> es, string assemblyName = null)
+        {
+            return es.Aggregate("", (current, x) => current + x.ToMarkDown(assemblyName));
         }
 
         static string ToCodeBlock(this string s)
