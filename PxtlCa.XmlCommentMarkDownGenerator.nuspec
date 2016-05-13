@@ -11,15 +11,9 @@
         <description>Convert Visual Studio generated XML Comment XML files into Github-flavoured MarkDown.</description>
         <releaseNotes>Guide available at https://github.com/Pxtl/XmlCommentMarkDownGenerator/blob/master/README.md</releaseNotes>
         <copyright>2016 Martin Zarate</copyright>
-        <dependencies>
-            <dependency id="CommandLineParser" version="1.9.71" />
-        </dependencies>
     </metadata>
     <files>
-        <file src="PxtlCa.XmlCommentMarkDownGenerator\bin\Debug\PxtlCa.XmlCommentMarkDownGenerator.exe" target="lib\PxtlCa.XmlCommentMarkDownGenerator.exe" />
-        <file src="PxtlCa.XmlCommentMarkDownGenerator\bin\Debug\PxtlCa.XmlCommentMarkDownGenerator.pdb" target="lib\PxtlCa.XmlCommentMarkDownGenerator.pdb" />
-        <file src="PxtlCa.XmlCommentMarkDownGenerator\Options.cs" target="src\Options.cs" />
-        <file src="PxtlCa.XmlCommentMarkDownGenerator\Program.cs" target="src\Program.cs" />
-        <file src="PxtlCa.XmlCommentMarkDownGenerator\XmlToMarkDown.cs" target="src\XmlToMarkDown.cs" />
+        <file src="PxtlCa.XmlCommentMarkDownGenerator\bin\Debug\PxtlCa.XmlCommentMarkDownGenerator.exe" target="tools\PxtlCa.XmlCommentMarkDownGenerator.exe" />
+		<file src="PxtlCa.XmlCommentMarkDownGenerator\bin\Debug\CommandLine.dll" target="tools\CommandLine.dll" />
     </files>
 </package>

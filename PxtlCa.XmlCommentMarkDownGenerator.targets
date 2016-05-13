@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="AfterBuild">
+    <MakeDir Directories="$(MSBuildProjectDirectory)\..\Docs" />
+    <Exec Command='"$(MSBuildThisFileDirectory)\..\Tools\PxtlCa.XmlCommentMarkDownGenerator.exe" -i $(MSBuildProjectDirectory)\$(OutputPath)\$(AssemblyName).xml -o $(MSBuildProjectDirectory)\..\Docs\$(AssemblyName).GeneratedXmlDoc.md' />
+    <Message Importance="high" Text="PxtlCa.XmlCommentMarkDownGenerator created file: $(MSBuildProjectDirectory)\..\Docs\$(AssemblyName).GeneratedXmlDoc.md" />
+  </Target>
+</Project>
