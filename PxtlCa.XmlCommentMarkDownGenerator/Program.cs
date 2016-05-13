@@ -17,6 +17,12 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
             var options = new Options();
             if (Parser.Default.ParseArguments(args, options))
             {
+                if(!options.ConsoleIn && options.InputFile == null
+                    || !options.ConsoleOut && options.OutputFile == null)
+                {
+                    Console.WriteLine(options.GetUsage());
+                    return;
+                }
                 // consume Options instance properties
                 var inReader = options.ConsoleIn
                     ? Console.In
@@ -36,7 +42,7 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
             else
             {
                 // Display the default usage information
-                Console.WriteLine(options.GetUsage());
+                
             }
         }
     }

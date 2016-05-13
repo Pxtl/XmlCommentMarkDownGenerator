@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>PxtlCa.XmlCommentMarkDownGenerator</id>
-        <version>0.1.5976.42747</version>
+        <version>0.1.5977.558</version>
         <title>PxtlCa.XmlCommentMarkDownGenerator</title>
         <authors>Martin Zarate</authors>
         <licenseUrl>https://opensource.org/licenses/MIT</licenseUrl>
@@ -11,6 +11,9 @@
         <description>Convert Visual Studio generated XML Comment XML files into Github-flavoured MarkDown.</description>
         <releaseNotes>Guide available at https://github.com/Pxtl/XmlCommentMarkDownGenerator/blob/master/README.md</releaseNotes>
         <copyright>2016 Martin Zarate</copyright>
+        <dependencies>
+            <dependency id="CommandLineParser" version="1.9.71" />
+        </dependencies>
     </metadata>
     <files>
         <file src="PxtlCa.XmlCommentMarkDownGenerator\bin\Debug\PxtlCa.XmlCommentMarkDownGenerator.exe" target="lib\PxtlCa.XmlCommentMarkDownGenerator.exe" />
