@@ -13,7 +13,7 @@
         <copyright>2016 Martin Zarate</copyright>
     </metadata>
     <files>
-        <file src="PxtlCa.XmlCommentMarkDownGenerator\bin\Debug\PxtlCa.XmlCommentMarkDownGenerator.pdb" target="lib\PxtlCa.XmlCommentMarkDownGenerator.pdb" />
         <file src="PxtlCa.XmlCommentMarkDownGenerator\bin\Debug\PxtlCa.XmlCommentMarkDownGenerator.exe" target="lib\PxtlCa.XmlCommentMarkDownGenerator.exe" />
+        <file src="PxtlCa.XmlCommentMarkDownGenerator\bin\Debug\PxtlCa.XmlCommentMarkDownGenerator.pdb" target="lib\PxtlCa.XmlCommentMarkDownGenerator.pdb" />
     </files>
 </package>
