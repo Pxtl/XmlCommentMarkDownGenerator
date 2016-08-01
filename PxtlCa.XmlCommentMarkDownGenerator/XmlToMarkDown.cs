@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
+using System.Diagnostics;
 
 namespace PxtlCa.XmlCommentMarkDownGenerator
 {
@@ -72,34 +73,44 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
                     {"none", x => new string[0]}
                 };
 
-            string name;
-            if (node.NodeType == XmlNodeType.Element)
-            {
-                var el = (XElement)node;
-                name = el.Name.LocalName;
-                if (name == "member")
+                string name;
+                if (node.NodeType == XmlNodeType.Element)
                 {
+                  var el = (XElement)node;
+                  name = el.Name.LocalName;
+                  if (name == "member")
+                  {
                     switch (el.Attribute("name").Value[0])
                     {
-                        case 'F': name = "field"; break;
-                        case 'P': name = "property"; break;
-                        case 'T': name = "type"; break;
-                        case 'E': name = "event"; break;
-                        case 'M': name = "method"; break;
-                        default: name = "none"; break;
+                      case 'F': name = "field"; break;
+                      case 'P': name = "property"; break;
+                      case 'T': name = "type"; break;
+                      case 'E': name = "event"; break;
+                      case 'M': name = "method"; break;
+                      default: name = "none"; break;
                     }
-                }
-                if (name == "see")
-                {
+                  }
+                  if (name == "see")
+                  {
                     var anchor = el.Attribute("cref").Value.StartsWith("!:#");
                     name = anchor ? "seeAnchor" : "seePage";
-                }
-                var vals = valueExtractorsDict[name](el).ToArray();
-                return string.Format(templates[name], args: vals);
+                  }
+                  var vals = valueExtractorsDict[name](el).ToArray();
+
+                  // Replace markers to make the MD human understandable
+                  string sRet = string.Format(templates[name], args: vals);
+                  sRet = sRet.Replace("F:", "Field ");
+                  sRet = sRet.Replace("M:", "Method ");
+                  sRet = sRet.Replace("P:", "Property ");
+                  sRet = sRet.Replace("T:", "Type ");
+                  sRet = sRet.Replace("E:", "Event ");
+
+                  return sRet;
             }
 
+
             if (node.NodeType == XmlNodeType.Text)
-                return Regex.Replace(((XText)node).Value.Replace('\n', ' '), @"\s+", " ");
+                      return Regex.Replace(((XText)node).Value.Replace('\n', ' '), @"\s+", " ");
 
             return "";
         }
