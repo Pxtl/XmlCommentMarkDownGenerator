@@ -1,6 +1,6 @@
 
 
-# This repository is forked from PxtlCa  
+# This repository is forked from Pxtl  
 https://github.com/Pxtl/XmlCommentMarkDownGenerator
 
 
