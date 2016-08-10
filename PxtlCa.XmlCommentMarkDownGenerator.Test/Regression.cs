@@ -21,7 +21,19 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.Test
 
             var expectedOutput = normalizeSpace.Replace(FetchResourceAsString(outputResourceName), " ");
             var actualOutput = normalizeSpace.Replace(testInput.ToMarkDown(), " ");
-             Assert.AreEqual(expectedOutput, actualOutput);
+            Assert.AreEqual(expectedOutput, actualOutput);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(System.Xml.XmlException))]
+        public void TestUnexpectedElement()
+        {
+            var inputResourceName = "PxtlCa.XmlCommentMarkDownGenerator.Test.UnexpectedElement_input.xml";
+            Regex normalizeSpace = new Regex(@"\s+", RegexOptions.Compiled);
+            var testInput = FetchResourceAsString(inputResourceName);
+            
+            //exception thrown below
+            var testOutput = normalizeSpace.Replace(testInput.ToMarkDown(), " ");
         }
 
         private static string FetchResourceAsString(string resourceName)
