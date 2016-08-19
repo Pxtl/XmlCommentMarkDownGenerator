@@ -25,5 +25,3 @@ in Docs at the solution level (peer to the project folder).
 
 TODO: error handling if the XML file does not exist.  Right now you *must* have XML document generation enabled for your project in 
 both debug and release or this will error out as it can't find the file.
-
-There is currently a bug that the --help is spat out twice, once with missing descriptions.  WIP.

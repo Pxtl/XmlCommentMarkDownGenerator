@@ -39,11 +39,6 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
                     outWriter.Close();
                 }
             }
-            else
-            {
-                // Display the default usage information
-                Console.WriteLine(options.GetUsage());
-            }
         }
     }
 }
