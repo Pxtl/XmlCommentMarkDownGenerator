@@ -23,5 +23,4 @@ https://www.nuget.org/packages/PxtlCa.XmlCommentMarkDownGenerator
 When used as a nuget package, it will add a target to your project to automatically convert generated xml into markdown file stored 
 in Docs at the solution level (peer to the project folder).
 
-TODO: error handling if the XML file does not exist.  Right now you *must* have XML document generation enabled for your project in 
-both debug and release or this will error out as it can't find the file.
+You must have XML documentation output enabled for your project in both debug and release configurations or it will warn that it can't find the file.

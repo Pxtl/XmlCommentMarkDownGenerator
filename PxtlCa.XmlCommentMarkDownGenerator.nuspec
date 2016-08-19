@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>PxtlCa.XmlCommentMarkDownGenerator</id>
-        <version>0.1.6066.35591</version>
+        <version>0.1.6074.36176</version>
         <title>PxtlCa.XmlCommentMarkDownGenerator</title>
         <authors>Martin Zarate</authors>
         <licenseUrl>https://opensource.org/licenses/MIT</licenseUrl>
