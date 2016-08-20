@@ -47,13 +47,17 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
+        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework">
+          <Private>False</Private>
+        </Reference>
       </ItemGroup>
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="ElementTests.cs" />
     <Compile Include="Regression.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="RegressionBigVariant_input.xml" />
@@ -69,6 +73,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="UnexpectedElement_input.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ElementPara_input.xml" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
