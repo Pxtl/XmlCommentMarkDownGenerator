@@ -4,8 +4,6 @@
 
  The SQLCLR BigVariant type 
 
-
-
 ---
 #### P:BigVariant.Type
 
@@ -13,7 +11,7 @@
 
 ##### Example: 
 
-######SQL code
+###### SQL code
 
 ```
     DECLARE @testInput bit = 1
@@ -22,22 +20,16 @@
     
 ```
 
-
-
-
-
 ---
 #### P:BigVariant.AsVariant
 
  If the BigVariant contains a SQL_VARIANT-compatible type, get its contents. Will throw an exception if the type is not SQL_VARIANT-compatible. 
 
-
-
 >DATETIME2s will be converted to DateTimes as interrim, use AsDateTime2 if you need DATETIME2s
 
 ##### Example: 
 
-######SQL code
+###### SQL code
 
 ```
     DECLARE @testInput float = 1.79E+308
@@ -47,10 +39,6 @@
     
 ```
 
-
-
-
-
 ---
 #### P:BigVariant.AsDateTime2
 
@@ -58,7 +46,7 @@
 
 ##### Example:  DATETIME2 Unit Test 
 
-######SQL code
+###### SQL code
 
 ```
     DECLARE @testInput DateTime2 = convert(DateTime2, '0001-01-01 11:59:00 PM')
@@ -67,10 +55,6 @@
     
 ```
 
-
-
-
-
 ---
 #### P:BigVariant.AsXml
 
@@ -78,7 +62,7 @@
 
 ##### Example:  Use xpath to pull data out of an Xml BigVariant. 
 
-######SQL code
+###### SQL code
 
 ```
     DECLARE @testInput Xml = convert(Xml
@@ -92,10 +76,6 @@
     
 ```
 
-
-
-
-
 ---
 #### P:BigVariant.AsString
 
@@ -103,7 +83,7 @@
 
 ##### Example:  Unit test. 
 
-######SQL code
+###### SQL code
 
 ```
     DECLARE @testString NVARCHAR(2000) = 'Silence is foo'
@@ -112,37 +92,25 @@
     
 ```
 
-
-
-
-
 ---
 #### P:BigVariant.AsBinary
 
  If the BigVariant contains VARBINARY(MAX) or similar long SqlBinary object, get its contents. Will throw an exception if the type is not VARBINARY(MAX) or similar long SqlBinary object. 
-
-
 
 ---
 #### M:BigVariant.Read(System.IO.BinaryReader)
 
  Implement IBinarySerialize.Read because SQL stores everything as binary even temporarily. Internal plumbing method, don't use. 
 
-
-
 ---
 #### M:BigVariant.Write(System.IO.BinaryWriter)
 
  Implement IBinarySerialize.Write because SQL stores everything as binary even temporarily. Internal plumbing method, don't use. 
 
-
-
 ---
 ## T:UserDefinedFunctions
 
  This class collects together various SQL User-Defined-functions used to construct BigVariant values out of various SQL types. 
-
-
 
 ---
 #### M:UserDefinedFunctions.BigVariantFromXml(System.Data.SqlTypes.SqlXml)
@@ -156,7 +124,7 @@ Returns: A BigVariant containing the given XML object
 
 ##### Example: 
 
-######SQL code
+###### SQL code
 
 ```
     DECLARE @testInput Xml = convert(Xml
@@ -169,10 +137,6 @@ Returns: A BigVariant containing the given XML object
     
 ```
 
-
-
-
-
 ---
 #### M:UserDefinedFunctions.BigVariantFromVariant(System.Object)
 
@@ -183,13 +147,11 @@ Returns: A BigVariant containing the given XML object
 |value: |a SQL_VARIANT to wrap in a BigVariant|
 Returns: A BigVariant containing the given SQL_VARIANT
 
-
-
 >DateTime2s will be converted to DateTimes as intermediate, use BigVariantFromDateTime2 for proper datetime2.
 
 ##### Example: 
 
-######SQL code
+###### SQL code
 
 ```
     DECLARE @testInput float = 1.79E+308
@@ -198,10 +160,6 @@ Returns: A BigVariant containing the given SQL_VARIANT
     -- returns 1.79E+308
     
 ```
-
-
-
-
 
 ---
 #### M:UserDefinedFunctions.BigVariantFromDateTime2(System.Nullable{System.DateTime})
@@ -212,8 +170,6 @@ Returns: A BigVariant containing the given SQL_VARIANT
 |-----|------|
 |value: |a DATETIME2 to wrap in a BigVariant|
 Returns: A BigVariant containing the given DATETIME2
-
-
 
 ---
 #### M:UserDefinedFunctions.BigVariantFromString(System.Data.SqlTypes.SqlString)
@@ -227,7 +183,7 @@ Returns: A BigVariant containing the given NVARCHAR(MAX) or TEXT or NTEXT
 
 ##### Example: 
 
-######SQL code
+###### SQL code
 
 ```
     DECLARE @testString NVARCHAR(MAX)
@@ -239,10 +195,6 @@ Returns: A BigVariant containing the given NVARCHAR(MAX) or TEXT or NTEXT
     
 ```
 
-
-
-
-
 ---
 #### M:UserDefinedFunctions.BigVariantFromBinary(System.Data.SqlTypes.SqlBinary)
 
@@ -253,8 +205,5 @@ Returns: A BigVariant containing the given NVARCHAR(MAX) or TEXT or NTEXT
 |value: |an VARBINARY(MAX) or IMAGE or other binary to wrap in a BigVariant|
 Returns: A BigVariant containing the given VARBINARY(MAX) or IMAGE or other binary
 
-
-
 ---
-
 

@@ -15,13 +15,17 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
         public static string ToMarkDown(this string e)
         {
             var xdoc = XDocument.Parse(e);
-            return xdoc.ToMarkDown();
+            return xdoc
+                .ToMarkDown()
+                .RemoveRedundantLineBreaks();
         }
 
         public static string ToMarkDown(this Stream e)
         {
             var xdoc = XDocument.Load(e);
-            return xdoc.ToMarkDown();
+            return xdoc
+                .ToMarkDown()
+                .RemoveRedundantLineBreaks();
         }
 
         public static string ToMarkDown(this XNode node, string assemblyName = null)
@@ -42,7 +46,7 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
                     {"remarks", "\n\n>{0}\n\n"},
                     {"example", "##### Example: {0}\n\n"},
                     {"para", "{0}\n\n"},
-                    {"code", "\n\n######{0} code\n\n```\n{1}\n```\n\n"},
+                    {"code", "\n\n###### {0} code\n\n```\n{1}\n```\n\n"},
                     {"seePage", "[[{1}|{0}]]"},
                     {"seeAnchor", "[{1}]({0})"},
                     {"param", "|Name | Description |\n|-----|------|\n|{0}: |{1}|\n" },
@@ -141,7 +145,12 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
         {
             var lines = s.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
             var blank = lines[0].TakeWhile(x => x == ' ').Count() - 4;
-            return string.Join("\n", lines.Select(x => new string(x.SkipWhile((y, i) => i < blank).ToArray())));
+            return string.Join("\n", lines.Select(x => new string(x.SkipWhile((y, i) => i < blank).ToArray()))).TrimEnd();
+        }
+
+        static string RemoveRedundantLineBreaks(this string s)
+        {
+            return Regex.Replace(s, @"\n\n\n+", "\n\n");
         }
     }
 }
