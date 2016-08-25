@@ -12,7 +12,7 @@ Usage: PxtlCa.XmlCommentMarkDownGenerator -i InputFileName.xml -o OutputFileName
 
   --help              Display this help screen.
 
-Execute PxtlCa.XmlCommentMarkDownGenerator.exe -help for usage if the above is out-of-date.
+Execute PxtlCa.XmlCommentMarkDownGenerator.exe --help for usage if the above is out-of-date.
 
 Generates Markdown from VS XML documentation file.  Forked from https://gist.github.com/lontivero/593fc51f1208555112e0 
 
