@@ -14,9 +14,7 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.Test
     {
         public ElementTests()
         {
-            //
-            // TODO: Add constructor logic here
-            //
+
         }
 
         private TestContext testContextInstance;
@@ -66,7 +64,28 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.Test
             Regex normalizeSpace = new Regex(@"\s+", RegexOptions.Compiled);
             var testInput = TestUtil.FetchResourceAsString(inputResourceName);
 
-            //exception thrown below
+            var testOutput = normalizeSpace.Replace(testInput.ToMarkDown(), " ");
+            //TODO: better test here
+        }
+
+        [TestMethod]
+        public void ElementC()
+        {
+            var inputResourceName = "PxtlCa.XmlCommentMarkDownGenerator.Test.ElementC_input.xml";
+            Regex normalizeSpace = new Regex(@"\s+", RegexOptions.Compiled);
+            var testInput = TestUtil.FetchResourceAsString(inputResourceName);
+
+            var testOutput = normalizeSpace.Replace(testInput.ToMarkDown(), " ");
+            Assert.IsTrue(testOutput.Contains("`code tag c`"));
+        }
+
+        [TestMethod]
+        public void ElementParam()
+        {
+            var inputResourceName = "PxtlCa.XmlCommentMarkDownGenerator.Test.ElementParam_input.xml";
+            Regex normalizeSpace = new Regex(@"\s+", RegexOptions.Compiled);
+            var testInput = TestUtil.FetchResourceAsString(inputResourceName);
+
             var testOutput = normalizeSpace.Replace(testInput.ToMarkDown(), " ");
         }
     }

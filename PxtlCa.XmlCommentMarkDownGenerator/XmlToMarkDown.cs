@@ -34,49 +34,6 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
             {
                 node = ((XDocument)node).Root;
             }
-            var templates = new Dictionary<string, string>
-                {
-                    {"doc", "# {0} #\n\n{1}\n\n"},
-                    {"type", "## {0}\n\n{1}\n\n---\n"},
-                    {"field", "#### {0}\n\n{1}\n\n---\n"},
-                    {"property", "#### {0}\n\n{1}\n\n---\n"},
-                    {"method", "#### {0}\n\n{1}\n\n---\n"},
-                    {"event", "#### {0}\n\n{1}\n\n---\n"},
-                    {"summary", "{0}\n\n"},
-                    {"remarks", "\n\n>{0}\n\n"},
-                    {"example", "##### Example: {0}\n\n"},
-                    {"para", "{0}\n\n"},
-                    {"code", "\n\n###### {0} code\n\n```\n{1}\n```\n\n"},
-                    {"seePage", "[[{1}|{0}]]"},
-                    {"seeAnchor", "[{1}]({0})"},
-                    {"param", "|Name | Description |\n|-----|------|\n|{0}: |{1}|\n" },
-                    {"exception", "[[{0}|{0}]]: {1}\n\n" },
-                    {"returns", "Returns: {0}\n\n"},
-                    {"none", ""}
-                };
-            var valueExtractorsDict = new Dictionary<string, Func<XElement, IEnumerable<string>>>
-                {
-                    {"doc", x=> new[]{
-                        x.Element("assembly").Element("name").Value,
-                        x.Element("members").Elements("member").ToMarkDown(x.Element("assembly").Element("name").Value)
-                    }},
-                    {"type", x=>ExtractNameAndBodyFromMember("name", x, assemblyName)},
-                    {"field", x=> ExtractNameAndBodyFromMember("name", x, assemblyName)},
-                    {"property", x=> ExtractNameAndBodyFromMember("name", x, assemblyName)},
-                    {"method",x=>ExtractNameAndBodyFromMember("name", x, assemblyName)},
-                    {"event", x=>ExtractNameAndBodyFromMember("name", x, assemblyName)},
-                    {"summary", x=> new[]{ x.Nodes().ToMarkDown(assemblyName) }},
-                    {"remarks", x => new[]{x.Nodes().ToMarkDown(assemblyName) }},
-                    {"example", x => new[]{x.Nodes().ToMarkDown(assemblyName) }},
-                    {"para", x=> new[]{ x.Nodes().ToMarkDown(assemblyName) }},
-                    {"code", x => new[]{x.Attribute("lang")?.Value ?? "", x.Value.ToCodeBlock()}},
-                    {"seePage", x=> ExtractNameAndBody("cref", x, assemblyName) },
-                    {"seeAnchor", x=> { var xx = ExtractNameAndBody("cref", x, assemblyName); xx[0] = xx[0].ToLower(); return xx; }},
-                    {"param", x => ExtractNameAndBody("name", x, assemblyName) },
-                    {"exception", x => ExtractNameAndBody("cref", x, assemblyName) },
-                    {"returns", x => new[]{x.Nodes().ToMarkDown(assemblyName) }},
-                    {"none", x => new string[0]}
-                };
 
             string name;
             if (node.NodeType == XmlNodeType.Element)
@@ -100,10 +57,20 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
                     var anchor = el.Attribute("cref").Value.StartsWith("!:#");
                     name = anchor ? "seeAnchor" : "seePage";
                 }
+                //treat first Param element separately to add table headers.
+                if (name == "param"
+                    && node
+                        .ElementsBeforeSelf()
+                        .LastOrDefault()
+                        ?.Name
+                        ?.LocalName != "param")
+                {
+                    name = "firstparam";
+                }
 
                 try { 
-                    var vals = valueExtractorsDict[name](el).ToArray();
-                    return string.Format(templates[name], args: vals);
+                    var vals = TagRenderer.Dict[name].ValueExtractor(el, assemblyName).ToArray();
+                    return string.Format(TagRenderer.Dict[name].FormatString, args: vals);
                 }
                 catch(KeyNotFoundException ex)
                 {
@@ -123,6 +90,7 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
             return new[]
                {
                     Regex.Replace(node.Attribute(att).Value, $@":{Regex.Escape(assemblyName)}\.", ":"), //remove leading namespace if it matches the assembly name
+                    //TODO: do same for function parameters
                     node.Nodes().ToMarkDown(assemblyName)
                 };
         }
@@ -141,7 +109,7 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
             return es.Aggregate("", (current, x) => current + x.ToMarkDown(assemblyName));
         }
 
-        static string ToCodeBlock(this string s)
+        internal static string ToCodeBlock(this string s)
         {
             var lines = s.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
             var blank = lines[0].TakeWhile(x => x == ' ').Count() - 4;

@@ -1,0 +1,13 @@
+﻿<?xml version="1.0"?>
+<doc>
+  <assembly>
+    <name>PxtlCa.TestAssembly</name>
+  </assembly>
+  <members>
+    <member name="T:PxtlCa.TestAssembly.TestType">
+      <summary>
+        This example involves the <c>code tag c</c>, does it work?
+      </summary>
+    </member>
+  </members>
+</doc>

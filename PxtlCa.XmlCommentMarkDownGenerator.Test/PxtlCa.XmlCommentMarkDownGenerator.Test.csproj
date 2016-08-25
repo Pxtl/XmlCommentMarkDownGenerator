@@ -77,6 +77,12 @@
   <ItemGroup>
     <EmbeddedResource Include="ElementPara_input.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ElementC_input.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ElementParam_input.xml" />
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

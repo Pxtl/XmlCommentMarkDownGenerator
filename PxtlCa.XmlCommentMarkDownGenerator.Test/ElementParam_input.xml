@@ -1,0 +1,21 @@
+﻿<?xml version="1.0"?>
+<doc>
+  <assembly>
+    <name>PxtlCa.TestAssembly</name>
+  </assembly>
+  <members>
+    <member name="T:PxtlCa.TestAssembly.TestType">
+      <summary>
+        parameter test type summary
+      </summary>
+    </member>
+    <member name="T:PxtlCa.TestAssembly.TestType.TestMethod(System.Object objA, System.Object objB)">
+      <summary>
+        parameter test method
+      </summary>
+      <param name="objA">object A foo</param>
+      <param name="objB">object B bar</param>
+      <returns>object C baz</returns>
+    </member>
+  </members>
+</doc>
