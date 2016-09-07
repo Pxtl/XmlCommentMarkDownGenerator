@@ -1,0 +1,14 @@
+﻿<?xml version="1.0"?>
+<doc>
+  <assembly>
+    <name>PxtlCa.TestAssembly</name>
+  </assembly>
+  <members>
+    <member name="T:PxtlCa.TestAssembly.TestType">
+      <summary>
+        The TestType type.
+      </summary>
+      <unexpectedelementtesttag>this should cause an error</unexpectedelementtesttag>
+    </member>
+  </members>
+</doc>

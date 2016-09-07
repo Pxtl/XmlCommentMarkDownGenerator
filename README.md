@@ -18,7 +18,7 @@ Usage: PxtlCa.XmlCommentMarkDownGenerator -i InputFileName.xml -o OutputFileName
 
   --help              Display this help screen.
 
-Execute PxtlCa.XmlCommentMarkDownGenerator.exe -help for usage if the above is out-of-date.
+Execute PxtlCa.XmlCommentMarkDownGenerator.exe --help for usage if the above is out-of-date.
 
 Generates Markdown from VS XML documentation file.  Forked from https://gist.github.com/lontivero/593fc51f1208555112e0 
 
@@ -29,7 +29,4 @@ https://www.nuget.org/packages/PxtlCa.XmlCommentMarkDownGenerator
 When used as a nuget package, it will add a target to your project to automatically convert generated xml into markdown file stored 
 in Docs at the solution level (peer to the project folder).
 
-TODO: error handling if the XML file does not exist.  Right now you *must* have XML document generation enabled for your project in 
-both debug and release or this will error out as it can't find the file.
-
-There is currently a bug that the --help is spat out twice, once with missing descriptions.  WIP.
+You must have XML documentation output enabled for your project in both debug and release configurations or it will warn that it can't find the file.

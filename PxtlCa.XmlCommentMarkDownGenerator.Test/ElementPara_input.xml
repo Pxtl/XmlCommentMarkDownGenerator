@@ -1,0 +1,14 @@
+﻿<?xml version="1.0"?>
+<doc>
+  <assembly>
+    <name>PxtlCa.TestAssembly</name>
+  </assembly>
+  <members>
+    <member name="T:PxtlCa.TestAssembly.TestType">
+      <summary>
+        <para>first paragraph</para>
+        <para>second paragraph</para>
+      </summary>
+    </member>
+  </members>
+</doc>
