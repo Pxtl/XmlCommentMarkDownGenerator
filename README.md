@@ -1,9 +1,3 @@
-
-
-# This repository is forked from Pxtl  
-https://github.com/Pxtl/XmlCommentMarkDownGenerator
-
-
 # XmlCommentMarkDownGenerator
 
 Usage: PxtlCa.XmlCommentMarkDownGenerator -i InputFileName.xml -o OutputFileName.md
