@@ -70,7 +70,15 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
 
                 try { 
                     var vals = TagRenderer.Dict[name].ValueExtractor(el, assemblyName).ToArray();
-                    return string.Format(TagRenderer.Dict[name].FormatString, args: vals);
+                    string sRet = string.Format(TagRenderer.Dict[name].FormatString, args: vals);
+
+                    sRet = sRet.Replace("F:", "Field ");
+                    sRet = sRet.Replace("M:", "Method ");
+                    sRet = sRet.Replace("P:", "Property ");
+                    sRet = sRet.Replace("T:", "Type ");
+                    sRet = sRet.Replace("E:", "Event ");
+
+                    return sRet;
                 }
                 catch(KeyNotFoundException ex)
                 {
@@ -78,6 +86,7 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
                     throw new XmlException($@"Unknown element type ""{ name }""", ex, lineInfo.LineNumber, lineInfo.LinePosition);
                 }
             }
+
 
             if (node.NodeType == XmlNodeType.Text)
                 return Regex.Replace(((XText)node).Value.Replace('\n', ' '), @"\s+", " ");
