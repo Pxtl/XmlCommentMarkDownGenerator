@@ -28,6 +28,14 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
                 .RemoveRedundantLineBreaks();
         }
 
+        private static Dictionary<string, string> _MemberNamePrefixDict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) {
+            {"F:", "Field"},
+            {"P:", "Property"},
+            {"T:", "Type"},
+            {"E:", "Event"},
+            {"M:", "Method"},
+        };
+
         public static string ToMarkDown(this XNode node, string assemblyName = null)
         {
             if(node is XDocument)
@@ -42,15 +50,12 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
                 name = el.Name.LocalName;
                 if (name == "member")
                 {
-                    switch (el.Attribute("name").Value[0])
+                    string expandedName = null;
+                    if(!_MemberNamePrefixDict.TryGetValue(el.Attribute("name").Value.Substring(0,2), out expandedName))
                     {
-                        case 'F': name = "field"; break;
-                        case 'P': name = "property"; break;
-                        case 'T': name = "type"; break;
-                        case 'E': name = "event"; break;
-                        case 'M': name = "method"; break;
-                        default: name = "none"; break;
+                        expandedName = "none";
                     }
+                    name = expandedName.ToLowerInvariant();
                 }
                 if (name == "see")
                 {
@@ -70,15 +75,7 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
 
                 try { 
                     var vals = TagRenderer.Dict[name].ValueExtractor(el, assemblyName).ToArray();
-                    string sRet = string.Format(TagRenderer.Dict[name].FormatString, args: vals);
-
-                    sRet = sRet.Replace("F:", "Field ");
-                    sRet = sRet.Replace("M:", "Method ");
-                    sRet = sRet.Replace("P:", "Property ");
-                    sRet = sRet.Replace("T:", "Type ");
-                    sRet = sRet.Replace("E:", "Event ");
-
-                    return sRet;
+                    return string.Format(TagRenderer.Dict[name].FormatString, args: vals);
                 }
                 catch(KeyNotFoundException ex)
                 {
@@ -94,12 +91,16 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
             return "";
         }
 
-        internal static string[] ExtractNameAndBodyFromMember(string att, XElement node, string assemblyName)
+        private static readonly Regex _PrefixReplacerRegex = new Regex(@"(^[A-Z]\:)");
+
+        internal static string[] ExtractNameAndBodyFromMember(XElement node, string assemblyName)
         {
+            var newName = Regex.Replace(node.Attribute("name").Value, $@":{Regex.Escape(assemblyName)}\.", ":"); //remove leading namespace if it matches the assembly name
+            //TODO: do same for function parameters
+            newName = _PrefixReplacerRegex.Replace(newName, match => _MemberNamePrefixDict[match.Value] + " "); //expand prefixes into more verbose words for member.
             return new[]
                {
-                    Regex.Replace(node.Attribute(att).Value, $@":{Regex.Escape(assemblyName)}\.", ":"), //remove leading namespace if it matches the assembly name
-                    //TODO: do same for function parameters
+                    newName,
                     node.Nodes().ToMarkDown(assemblyName)
                 };
         }

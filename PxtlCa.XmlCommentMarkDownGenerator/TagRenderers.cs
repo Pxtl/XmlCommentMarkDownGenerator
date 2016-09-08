@@ -34,23 +34,23 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
             )},
             {"type", new TagRenderer(
                 "## {0}\n\n{1}\n\n---\n",
-                (x, assemblyName) => XmlToMarkdown.ExtractNameAndBodyFromMember("name", x, assemblyName)
+                (x, assemblyName) => XmlToMarkdown.ExtractNameAndBodyFromMember(x, assemblyName)
             )},
             {"field", new TagRenderer(
                 "#### {0}\n\n{1}\n\n---\n",
-                (x, assemblyName) => XmlToMarkdown.ExtractNameAndBodyFromMember("name", x, assemblyName)
+                (x, assemblyName) => XmlToMarkdown.ExtractNameAndBodyFromMember(x, assemblyName)
             )},
             {"property", new TagRenderer(
                 "#### {0}\n\n{1}\n\n---\n",
-                (x, assemblyName) => XmlToMarkdown.ExtractNameAndBodyFromMember("name", x, assemblyName)
+                (x, assemblyName) => XmlToMarkdown.ExtractNameAndBodyFromMember(x, assemblyName)
             )},
             {"method", new TagRenderer(
                 "#### {0}\n\n{1}\n\n---\n",
-                (x, assemblyName) => XmlToMarkdown.ExtractNameAndBodyFromMember("name", x, assemblyName)
+                (x, assemblyName) => XmlToMarkdown.ExtractNameAndBodyFromMember(x, assemblyName)
             )},
             {"event", new TagRenderer(
                 "#### {0}\n\n{1}\n\n---\n",
-                (x, assemblyName) => XmlToMarkdown.ExtractNameAndBodyFromMember("name", x, assemblyName)
+                (x, assemblyName) => XmlToMarkdown.ExtractNameAndBodyFromMember(x, assemblyName)
             )},
             {"summary", new TagRenderer(
                 "{0}\n\n",
