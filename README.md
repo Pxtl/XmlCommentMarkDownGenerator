@@ -20,7 +20,8 @@ Can be used as a stand-alone Markdown command-line tool, but is also available a
 
 https://www.nuget.org/packages/PxtlCa.XmlCommentMarkDownGenerator
 
-When used as a nuget package, it will add a target to your project to automatically convert generated xml into markdown file stored 
-in Docs at the solution level (peer to the project folder).
+When used as a nuget package, it will add a target to your project to automatically convert generated xml into markdown file stored in Docs at the solution level (peer to the project folder).
+
+(note: the above nuget target was broken after 0.1.5977.1837 because I forgot to commit the nuspec line that does it.  Oops.  Fixed in 0.2.6130.564)
 
 You must have XML documentation output enabled for your project in both debug and release configurations or it will warn that it can't find the file.
