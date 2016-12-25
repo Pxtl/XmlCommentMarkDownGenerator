@@ -93,6 +93,10 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
                 "|{0}: |{1}|\n",
                 (x, assemblyName) => XmlToMarkdown.ExtractNameAndBody("name", x, assemblyName)
             ),
+            ["paramref"] = new TagRenderer(
+                "`{0}`",
+                (x, assemblyName) => XmlToMarkdown.ExtractNameAndBody("name", x, assemblyName)
+            ),
             ["exception"] = new TagRenderer(
                 "[[{0}|{0}]]: {1}\n\n",
                 (x, assemblyName) => XmlToMarkdown.ExtractNameAndBody("cref", x, assemblyName)

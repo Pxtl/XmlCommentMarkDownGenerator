@@ -57,7 +57,7 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
                 }
                 if (name == "see")
                 {
-                    var anchor = el.Attribute("cref").Value.StartsWith("!:#");
+                    var anchor = el.Attribute("cref") != null && el.Attribute("cref").Value.StartsWith("!:#");
                     name = anchor ? "seeAnchor" : "seePage";
                 }
                 //treat first Param element separately to add table headers.
@@ -107,7 +107,7 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
         {
             return new[]
                {
-                    node.Attribute(att).Value,
+                    node.Attribute(att)?.Value,
                     node.Nodes().ToMarkDown(assemblyName)
                 };
         }
