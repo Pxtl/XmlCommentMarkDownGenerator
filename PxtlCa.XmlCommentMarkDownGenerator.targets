@@ -8,7 +8,7 @@
     />
     <MakeDir Directories="$(MSBuildProjectDirectory)\..\Docs" />
     <Exec
-      Command='"$(MSBuildThisFileDirectory)\..\Tools\PxtlCa.XmlCommentMarkDownGenerator.exe" -i $(MSBuildProjectDirectory)\$(OutputPath)\$(AssemblyName).xml -o $(MSBuildProjectDirectory)\..\Docs\$(AssemblyName).GeneratedXmlDoc.md'
+      Command='"$(MSBuildThisFileDirectory)\..\Tools\PxtlCa.XmlCommentMarkDownGenerator.exe" -i "$(MSBuildProjectDirectory)\$(OutputPath)\$(AssemblyName).xml" -o "$(MSBuildProjectDirectory)\..\Docs\$(AssemblyName).GeneratedXmlDoc.md"'
       Condition="Exists('$(MSBuildProjectDirectory)\$(OutputPath)\$(AssemblyName).xml')"
     />
     <Message
