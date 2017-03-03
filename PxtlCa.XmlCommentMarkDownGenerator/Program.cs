@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Xml;
 using System.Xml.Linq;
 using CommandLine;
-using CommandLine.Text; // if you want text formatting helpers (recommended)
 
 namespace PxtlCa.XmlCommentMarkDownGenerator
 {

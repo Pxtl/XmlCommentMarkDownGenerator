@@ -1,9 +1,4 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Reflection;
-using System.IO;
-using PxtlCa.XmlCommentMarkDownGenerator;
-using System.Xml.Linq;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Text.RegularExpressions;
 
 namespace PxtlCa.XmlCommentMarkDownGenerator.Test

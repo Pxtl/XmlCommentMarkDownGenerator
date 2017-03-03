@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -29,11 +27,11 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
         }
 
         private static Dictionary<string, string> _MemberNamePrefixDict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) {
-            {"F:", "Field"},
-            {"P:", "Property"},
-            {"T:", "Type"},
-            {"E:", "Event"},
-            {"M:", "Method"},
+            ["F:"] = "Field",
+            ["P:"] = "Property",
+            ["T:"] = "Type",
+            ["E:"] = "Event",
+            ["M:"] = "Method",
         };
 
         public static string ToMarkDown(this XNode node, string assemblyName = null)
@@ -59,11 +57,11 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
                 }
                 if (name == "see")
                 {
-                    var anchor = el.Attribute("cref").Value.StartsWith("!:#");
+                    var anchor = el.Attribute("cref") != null && el.Attribute("cref").Value.StartsWith("!:#");
                     name = anchor ? "seeAnchor" : "seePage";
                 }
                 //treat first Param element separately to add table headers.
-                if (name == "param"
+                if (name.EndsWith("param")
                     && node
                         .ElementsBeforeSelf()
                         .LastOrDefault()
@@ -109,7 +107,7 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
         {
             return new[]
                {
-                    node.Attribute(att).Value,
+                    node.Attribute(att)?.Value,
                     node.Nodes().ToMarkDown(assemblyName)
                 };
         }
