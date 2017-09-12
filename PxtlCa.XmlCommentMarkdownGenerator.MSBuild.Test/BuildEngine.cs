@@ -18,15 +18,9 @@ namespace PxtlCa.XmlCommentMarkdownGenerator.MSBuild.Test
             var mockRepo = new MockRepository();
             var buildEngine = mockRepo.Stub<IBuildEngine>();
 
-            var inputPath = @"bin\Debug\PxtlCa.XmlCommentMarkDownGenerator.MSBuild.xml";
-            //get relative path here
-            //1. get current directory
-            //2. find PxtlCa.XmlCommentMarkDownGenerator.MSBuild.xml in the file system.
-            //3. adjust relative path until File.Exists(inputPath)
-
-            //then adjust the path and doc path, output file, etc.
-            var docPath = @"..\Docs";
-            var outputFile = new TaskItem("Readme.md");
+            var inputPath = @"..\..\..\PxtlCa.XmlCommentMarkdownGenerator.MSBuild\bin\Debug\PxtlCa.XmlCommentMarkDownGenerator.MSBuild.xml";
+            var docPath = @"..\..\Docs";
+            var outputFile = new TaskItem(@"..\..\Readme.md");
 
             
             var inputXml = new ITaskItem[] { new TaskItem(inputPath) };
@@ -43,6 +37,11 @@ namespace PxtlCa.XmlCommentMarkdownGenerator.MSBuild.Test
             };
 
             task.Execute();
+
+            var expectFileExists = true;
+            var fileActuallyExists = System.IO.File.Exists(outputFile.ItemSpec);
+
+            Assert.AreEqual(expectFileExists, fileActuallyExists);
         }
     }
 }

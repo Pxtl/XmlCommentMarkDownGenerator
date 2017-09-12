@@ -88,25 +88,25 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild
             var otherMDFiles = Directory.EnumerateFiles(DocumentationPath.ItemSpec, "*.md", SearchOption.AllDirectories).ToList();
             otherMDFiles = otherMDFiles.Except(GeneratedMDFiles).ToList();
             var mergeInto = otherMDFiles.FirstOrDefault();
-            if(null == mergeInto)
+            if (null == mergeInto)
             {
                 mergeInto = GeneratedMDFiles.First();
                 File.Copy(mergeInto, OutputFile.ItemSpec, true);
-                foreach(var mdFile in GeneratedMDFiles.Skip(1))
+                foreach (var mdFile in GeneratedMDFiles.Skip(1))
                 {
                     File.AppendAllText(OutputFile.ItemSpec, Environment.NewLine);
                     File.AppendAllText(OutputFile.ItemSpec, File.ReadAllText(mdFile));
                 }
             }
-            else if(otherMDFiles.Count > 1)
+            else
             {
-                 File.Copy(mergeInto, OutputFile.ItemSpec, true);
+                File.Copy(mergeInto, OutputFile.ItemSpec, true);
                 foreach (var mdFile in otherMDFiles.Skip(1))
                 {
                     File.AppendAllText(OutputFile.ItemSpec, Environment.NewLine);
                     File.AppendAllText(OutputFile.ItemSpec, File.ReadAllText(mdFile));
                 }
-                foreach(var mdFile in GeneratedMDFiles)
+                foreach (var mdFile in GeneratedMDFiles)
                 {
                     File.AppendAllText(OutputFile.ItemSpec, Environment.NewLine);
                     File.AppendAllText(OutputFile.ItemSpec, File.ReadAllText(mdFile));
