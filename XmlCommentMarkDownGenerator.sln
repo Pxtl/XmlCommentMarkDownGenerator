@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PxtlCa.XmlCommentMarkDownGe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PxtlCa.XmlCommentMarkDownGenerator.MSBuild", "PxtlCa.XmlCommentMarkDownGenerator.MSBuild\PxtlCa.XmlCommentMarkDownGenerator.MSBuild.csproj", "{9FCEE209-508F-474E-80C2-D0966E4AA126}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PxtlCa.XmlCommentMarkdownGenerator.MSBuild.Test", "PxtlCa.XmlCommentMarkdownGenerator.MSBuild.Test\PxtlCa.XmlCommentMarkdownGenerator.MSBuild.Test.csproj", "{2358183D-B57C-467D-B89C-16C6BE040753}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{9FCEE209-508F-474E-80C2-D0966E4AA126}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9FCEE209-508F-474E-80C2-D0966E4AA126}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9FCEE209-508F-474E-80C2-D0966E4AA126}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2358183D-B57C-467D-B89C-16C6BE040753}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2358183D-B57C-467D-B89C-16C6BE040753}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2358183D-B57C-467D-B89C-16C6BE040753}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2358183D-B57C-467D-B89C-16C6BE040753}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

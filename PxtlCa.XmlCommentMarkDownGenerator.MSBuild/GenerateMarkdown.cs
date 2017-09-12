@@ -10,22 +10,43 @@ using System.Xml.Linq;
 
 namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild
 {
+    /// <summary>
+    /// A task that generates and optionally merges markdown
+    /// </summary>
     public class GenerateMarkdown : Task
     {
+        /// <summary>
+        /// The file(s) from which to generate markdown.  This should be in XmlDocumentation format.
+        /// </summary>
         [Required]
         public ITaskItem[] InputXml { get; set; }
 
+        /// <summary>
+        /// DocumentationPath is the top level directory in which to search for files.
+        /// It is also the path where generated markdown files are created.
+        /// </summary>
         [Required]
         public ITaskItem DocumentationPath { get; set; }
 
+        /// <summary>
+        /// Whether the generated markdown files should merge.  Only valid if multiple markdown files exist.
+        /// DocumentationPath is the top level directory in which to search for files.
+        /// Both existing markdown files and the generated files are merged.
+        /// </summary>
         [Required]
         public bool MergeFiles { get; set; }
 
+        /// <summary>
+        /// The file to be created by the merge.  Unused if MergeFiles evaluates to false.
+        /// </summary>
         public ITaskItem OutputFile { get; set; }
 
 
 
-
+        /// <summary>
+        /// Runs the task as configured
+        /// </summary>
+        /// <returns>true if task has succeeded</returns>
         public override bool Execute()
         {
             if(InputXml.Length == 0)
@@ -117,7 +138,7 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild
             {
                 return DocumentationPath.ItemSpec;
             }
-            return $@"{DocumentationPath.ItemSpec}\{inputXml.Replace(".xml", ".md")}";
+            return $@"{DocumentationPath.ItemSpec}\{Path.GetFileNameWithoutExtension(inputXml)}.md";
         }
 
         private bool DocumentationPathIsFile
@@ -125,6 +146,9 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild
             get { return File.Exists(DocumentationPath.ItemSpec); }
         }
 
+        /// <summary>
+        /// The files generated during execution of the task
+        /// </summary>
         public List<string> GeneratedMDFiles { get; private set; } = new List<string>();
 
         private void CreateDirectoryIfNeeded()
