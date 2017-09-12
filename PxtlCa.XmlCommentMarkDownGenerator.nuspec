@@ -1,21 +1,21 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
-    <metadata>
-        <id>PxtlCa.XmlCommentMarkDownGenerator</id>
-        <version>0.2.6130.564</version>
-        <title>PxtlCa.XmlCommentMarkDownGenerator</title>
-        <authors>Martin Zarate</authors>
-        <licenseUrl>https://opensource.org/licenses/MIT</licenseUrl>
-        <projectUrl>https://github.com/Pxtl/XmlCommentMarkDownGenerator</projectUrl>
-        <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>Convert Visual Studio generated XML Comment XML files into Github-flavoured MarkDown.</description>
-        <releaseNotes>Guide available at https://github.com/Pxtl/XmlCommentMarkDownGenerator/blob/master/README.md</releaseNotes>
-        <copyright>2016 Martin Zarate</copyright>
-    </metadata>
-    <files>
-        <file src="PxtlCa.XmlCommentMarkDownGenerator.targets" target="build\PxtlCa.XmlCommentMarkDownGenerator.targets" />
-        <file src="PxtlCa.XmlCommentMarkDownGenerator\bin\Debug\PxtlCa.XmlCommentMarkDownGenerator.exe" target="lib\net452\PxtlCa.XmlCommentMarkDownGenerator.exe" />
-        <file src="PxtlCa.XmlCommentMarkDownGenerator.MSBuild\bin\Debug\PxtlCa.XmlCommentMarkDownGenerator.MSBuild.dll" target="lib\net452\PxtlCa.XmlCommentMarkDownGenerator.MSBuild.dll" />
-        <file src="PxtlCa.XmlCommentMarkDownGenerator\bin\Debug\CommandLine.dll" target="tools\CommandLine.dll" />
-    </files>
+	<metadata>
+		<id>PxtlCa.XmlCommentMarkDownGenerator</id>
+		<version>0.2.6130.564</version>
+		<title>PxtlCa.XmlCommentMarkDownGenerator</title>
+		<authors>Martin Zarate</authors>
+		<licenseUrl>https://opensource.org/licenses/MIT</licenseUrl>
+		<projectUrl>https://github.com/Pxtl/XmlCommentMarkDownGenerator</projectUrl>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<description>Convert Visual Studio generated XML Comment XML files into Github-flavoured MarkDown.</description>
+		<releaseNotes>Guide available at https://github.com/Pxtl/XmlCommentMarkDownGenerator/blob/master/README.md</releaseNotes>
+		<copyright>2016 Martin Zarate</copyright>
+	</metadata>
+	<files>
+		<file src="PxtlCa.XmlCommentMarkDownGenerator\bin\Debug\PxtlCa.XmlCommentMarkDownGenerator.exe" target="tools\PxtlCa.XmlCommentMarkDownGenerator.exe" />
+		<file src="PxtlCa.XmlCommentMarkDownGenerator.MSBuild\bin\Debug\PxtlCa.XmlCommentMarkDownGenerator.MSBuild.dll" target="tools\PxtlCa.XmlCommentMarkDownGenerator.MSBuild.dll" />
+		<file src="PxtlCa.XmlCommentMarkDownGenerator\bin\Debug\CommandLine.dll" target="tools\CommandLine.dll" />
+		<file src="PxtlCa.XmlCommentMarkDownGenerator.targets" target="build\PxtlCa.XmlCommentMarkDownGenerator.targets" />
+	</files>
 </package>
