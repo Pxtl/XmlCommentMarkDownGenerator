@@ -7,6 +7,7 @@ using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using System.IO;
 using System.Xml.Linq;
+using System.Xml;
 
 namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild
 {
@@ -41,7 +42,13 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild
         /// </summary>
         public ITaskItem OutputFile { get; set; }
 
+        /// <summary>
+        /// Defaults to false. When true unexpected tags in the documentation
+        /// will generate warnings rather than errors. 
+        /// </summary>
+        public bool WarnOnUnexpectedTag { get; set; } = false;
 
+      
 
         /// <summary>
         /// Runs the task as configured
@@ -75,11 +82,18 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild
                 }
                 catch(Exception ex)
                 {
+                    LoggedException = ex;
                     Log.LogErrorFromException(ex);
                 }
             }
             return false;
         }
+
+        /// <summary>
+        /// for testing.  
+        /// sets the exception for throw outside the catch
+        /// </summary>
+        public Exception LoggedException { get; set; }
 
         private void Merge()
         {
@@ -118,16 +132,28 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild
         {
             foreach (var inputFile in InputXml)
             {
-                var mdOutput = OutputPath(inputFile.ItemSpec);
-                GeneratedMDFiles.Add(mdOutput);
-                var sr = new StreamReader(inputFile.ItemSpec);
-                using (var sw = new StreamWriter(mdOutput))
+                try
                 {
-                    var xml = sr.ReadToEnd();
-                    var doc = XDocument.Parse(xml);
-                    var md = doc.Root.ToMarkDown();
-                    sw.Write(md);
-                    sw.Close();
+                    var mdOutput = OutputPath(inputFile.ItemSpec);
+                    GeneratedMDFiles.Add(mdOutput);
+                    var sr = new StreamReader(inputFile.ItemSpec);
+                    using (var sw = new StreamWriter(mdOutput))
+                    {
+                        var xml = sr.ReadToEnd();
+                        var doc = XDocument.Parse(xml);
+                        var md = doc.Root.ToMarkDown();
+                        sw.Write(md);
+                        sw.Close();
+                    }
+                }catch(XmlException xmlException)
+                {
+                    if(WarnOnUnexpectedTag && null != xmlException.InnerException && 
+                        xmlException.InnerException.GetType() == typeof(KeyNotFoundException))
+                    {
+                        Log.LogWarningFromException(xmlException);
+                        continue;
+                    }
+                    throw;
                 }
             }
         }
