@@ -124,7 +124,14 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild
             }
         }
 
-        private bool TryGetFrontMatter(string filePath, out string frontMatter, out bool isEmpty)
+        /// <summary>
+        /// Use this to handle front matter in markdown files
+        /// </summary>
+        /// <param name="filePath">the path to the file</param>
+        /// <param name="frontMatter">the front matter found</param>
+        /// <param name="isEmpty">whether the front matter found is trivial</param>
+        /// <returns>true if front matter indicator(s) are found</returns>
+        public static bool TryGetFrontMatter(string filePath, out string frontMatter, out bool isEmpty)
         {
             var lines = File.ReadLines(filePath);
             var firstDashedLine = lines.FirstOrDefault() ?? string.Empty;
@@ -158,7 +165,7 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild
                 .Build();
             var options = deserializer.Deserialize<YamlOptions>(input);
             MergeFiles = options.MergeXmlComments;
-            if(Enum.TryParse<AllowedTagOptions>(options.AllowedCustomTags,
+            if(Enum.TryParse<AllowedTagOptions>(options.AllowedCustomTags, true, 
                     out AllowedTagOptions result))
             {
                 //warn (rather than treat as error condition)

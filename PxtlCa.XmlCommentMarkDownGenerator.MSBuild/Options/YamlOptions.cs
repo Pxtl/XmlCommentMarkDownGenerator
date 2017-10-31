@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using YamlDotNet.Serialization;
 
 namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild.Options
 {
@@ -10,7 +11,7 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild.Options
     /// Specifies the manner in which custom tags will be handled
     /// </summary>
     public enum AllowedTagOptions
-    {
+    { 
         /// <summary>
         /// All custom tags are allowed
         /// </summary>
@@ -25,7 +26,9 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild.Options
     /// </summary>
     public class YamlOptions
     {
+        [YamlMember(Alias = "MergeXmlComments", ApplyNamingConventions = false)]
         public bool MergeXmlComments { get; set; }
+        [YamlMember(Alias = "AllowedCustomTags", ApplyNamingConventions = false)]
         public string AllowedCustomTags { get; set; }
     }
 }
