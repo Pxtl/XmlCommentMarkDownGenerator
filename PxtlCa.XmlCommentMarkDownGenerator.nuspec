@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
 	<metadata>
 		<id>PxtlCa.XmlCommentMarkDownGenerator</id>
-		<version>0.2.6130.564</version>
+		<version>0.3.0.0</version>
 		<title>PxtlCa.XmlCommentMarkDownGenerator</title>
 		<authors>Martin Zarate</authors>
 		<licenseUrl>https://opensource.org/licenses/MIT</licenseUrl>
@@ -14,6 +14,7 @@
 	</metadata>
 	<files>
 		<file src="PxtlCa.XmlCommentMarkDownGenerator\bin\Debug\PxtlCa.XmlCommentMarkDownGenerator.exe" target="tools\PxtlCa.XmlCommentMarkDownGenerator.exe" />
+		<file src="PxtlCa.XmlCommentMarkDownGenerator.MSBuild\bin\Debug\PxtlCa.XmlCommentMarkDownGenerator.MSBuild.dll" target="tools\PxtlCa.XmlCommentMarkDownGenerator.MSBuild.dll" />
 		<file src="PxtlCa.XmlCommentMarkDownGenerator\bin\Debug\CommandLine.dll" target="tools\CommandLine.dll" />
 		<file src="PxtlCa.XmlCommentMarkDownGenerator.targets" target="build\PxtlCa.XmlCommentMarkDownGenerator.targets" />
 	</files>

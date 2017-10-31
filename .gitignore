@@ -253,3 +253,6 @@ paket-files/
 # SSDT artifacts
 Model.xml
 *.FileListAbsolute.txt
+PxtlCa.XmlCommentMarkdownGenerator.MSBuild.Test/Readme.md
+PxtlCa.XmlCommentMarkdownGenerator.MSBuild.Test/Docs/PxtlCa.XmlCommentMarkDownGenerator.MSBuild_altered.md
+PxtlCa.XmlCommentMarkdownGenerator.MSBuild.Test/Docs/PxtlCa.XmlCommentMarkDownGenerator.MSBuild.md
