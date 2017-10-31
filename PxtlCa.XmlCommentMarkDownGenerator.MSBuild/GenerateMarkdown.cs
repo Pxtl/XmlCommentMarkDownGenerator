@@ -8,6 +8,9 @@ using Microsoft.Build.Utilities;
 using System.IO;
 using System.Xml.Linq;
 using System.Xml;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
+using PxtlCa.XmlCommentMarkDownGenerator.MSBuild.Options;
 
 namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild
 {
@@ -34,7 +37,6 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild
         /// DocumentationPath is the top level directory in which to search for files.
         /// Both existing markdown files and the generated files are merged.
         /// </summary>
-        [Required]
         public bool MergeFiles { get; set; }
 
         /// <summary>
@@ -56,37 +58,113 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild
         /// <returns>true if task has succeeded</returns>
         public override bool Execute()
         {
-            if(InputXml.Length == 0)
+            if (InputXml.Length == 0)
             {
                 Log.LogError("InputXml cannot be empty");
             }
-            else if(MergeFiles && (null == OutputFile))
-            {
-                Log.LogError("OutputFile must be specified if input files are merged");
-            }
-            else if(DocumentationPathIsFile && InputXml.Length != 1)
-            {
-                Log.LogError("DocumentationPath must specify a directory is more than one input XML value is supplied");
-            }
             else
             {
-                try
+                UpdateParametersFromInput();
+                if (MergeFiles && (null == OutputFile))
                 {
-                    CreateDirectoryIfNeeded();
-                    GenerateFiles();
-                    if(MergeFiles)
-                    {
-                        Merge();
-                    }
-                    return true;
+                    Log.LogError("OutputFile must be specified if input files are merged");
                 }
-                catch(Exception ex)
+                else if (DocumentationPathIsFile && InputXml.Length != 1)
                 {
-                    LoggedException = ex;
-                    Log.LogErrorFromException(ex);
+                    Log.LogError("DocumentationPath must specify a directory if more than one input XML value is supplied");
+                }
+                else
+                {
+                    try
+                    {
+                        CreateDirectoryIfNeeded();
+                        GenerateFiles();
+                        if (MergeFiles)
+                        {
+                            Merge();
+                        }
+                        return true;
+                    }
+                    catch (Exception ex)
+                    {
+                        LoggedException = ex;
+                        Log.LogErrorFromException(ex);
+                    }
                 }
             }
             return false;
+        }
+
+        /// <summary>
+        /// This updates the tag and merge parameters based on the input front matter
+        /// </summary>
+        public void UpdateParametersFromInput()
+        {
+            if(DocumentationPathIsFile)
+            {
+                if (TryGetFrontMatter(DocumentationPath.ItemSpec, out string frontMatter, out bool isEmpty) && 
+                    (!isEmpty))
+                {
+                    ReadOptionsFromString(frontMatter);
+                    return;
+                }
+            }
+            else
+            {
+                var mdFiles = Directory.EnumerateFiles(DocumentationPath.ItemSpec, "*.md", SearchOption.AllDirectories).ToList();
+                foreach (var mdFile in mdFiles)
+                {
+                    if (TryGetFrontMatter(mdFile, out string frontMatter, out bool isEmpty) &&
+                    (!isEmpty))
+                    {
+                        ReadOptionsFromString(frontMatter);
+                        return;
+                    }
+                }
+            }
+        }
+
+        private bool TryGetFrontMatter(string filePath, out string frontMatter, out bool isEmpty)
+        {
+            var lines = File.ReadLines(filePath);
+            var firstDashedLine = lines.FirstOrDefault() ?? string.Empty;
+            if (firstDashedLine.StartsWith("---"))
+            {
+                var followingLines = lines.Skip(1).TakeWhile(line => !line.StartsWith("---")).ToList();
+                if(followingLines.Count == 0)
+                {
+                    frontMatter = firstDashedLine;
+                    isEmpty = true;
+                    return true;
+                }
+                else
+                {
+                    followingLines.Insert(0, firstDashedLine);
+                    frontMatter = String.Join(Environment.NewLine, followingLines);
+                    isEmpty = false;
+                    return true;
+                }
+            }
+            frontMatter = string.Empty;
+            isEmpty = true;
+            return false;
+        }
+
+        private void ReadOptionsFromString(string frontMatter)
+        {
+            var input = new StringReader(frontMatter);
+            var deserializer = new DeserializerBuilder()
+                .WithNamingConvention(new CamelCaseNamingConvention())
+                .Build();
+            var options = deserializer.Deserialize<YamlOptions>(input);
+            MergeFiles = options.MergeXmlComments;
+            if(Enum.TryParse<AllowedTagOptions>(options.AllowedCustomTags,
+                    out AllowedTagOptions result))
+            {
+                //warn (rather than treat as error condition)
+                //if user indicates one of the two currently used options
+                WarnOnUnexpectedTag = result == AllowedTagOptions.All;
+            }
         }
 
         /// <summary>
