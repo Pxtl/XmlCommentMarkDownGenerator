@@ -47,8 +47,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BuildMessageWarningLogger.cs" />
     <Compile Include="GenerateMarkdown.cs" />
-    <Compile Include="Options\YamlOptions.cs" />
+    <Compile Include="Model\SourceDocument.cs" />
+    <Compile Include="Model\TransformationInput.cs" />
+    <Compile Include="Model\YamlOptions.cs" />
+    <Compile Include="CrudeNaturalSort.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

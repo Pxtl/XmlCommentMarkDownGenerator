@@ -2,11 +2,11 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("PxtlCa.XmlCommentMarkdownGenerator.MSBuild.Test")]
+[assembly: AssemblyTitle("PxtlCa.XmlCommentMarkDownGenerator.MSBuild.Test")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("PxtlCa.XmlCommentMarkdownGenerator.MSBuild.Test")]
+[assembly: AssemblyProduct("PxtlCa.XmlCommentMarkDownGenerator.MSBuild.Test")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

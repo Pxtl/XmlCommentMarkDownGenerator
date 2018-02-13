@@ -11,6 +11,7 @@ using System.Xml;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 using PxtlCa.XmlCommentMarkDownGenerator.MSBuild.Options;
+using System.Text.RegularExpressions;
 
 namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild
 {
@@ -26,31 +27,22 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild
         public ITaskItem[] InputXml { get; set; }
 
         /// <summary>
-        /// DocumentationPath is the top level directory in which to search for files.
-        /// It is also the path where generated markdown files are created.
+        /// DocumentationPath is the top level directory in which 
+        /// generated markdown files are created.
         /// </summary>
         [Required]
-        public ITaskItem DocumentationPath { get; set; }
+        public ITaskItem TargetDocumentDirPath { get; set; }
 
         /// <summary>
-        /// Whether the generated markdown files should merge.  Only valid if multiple markdown files exist.
-        /// DocumentationPath is the top level directory in which to search for files.
-        /// Both existing markdown files and the generated files are merged.
+        /// SourceDocumentDirPath is the top level directory in which to search for markdown files.
         /// </summary>
-        public bool MergeFiles { get; set; }
+        [Required]
+        public ITaskItem SourceDocumentDirPath { get; set; }
 
         /// <summary>
-        /// The file to be created by the merge.  Unused if MergeFiles evaluates to false.
+        /// Defaults to Error. Event to execute when an unexpected tag is found. 
         /// </summary>
-        public ITaskItem OutputFile { get; set; }
-
-        /// <summary>
-        /// Defaults to false. When true unexpected tags in the documentation
-        /// will generate warnings rather than errors. 
-        /// </summary>
-        public bool WarnOnUnexpectedTag { get; set; } = false;
-
-      
+        public UnexpectedTagActionEnum UnexpectedTagAction { get; set; } = UnexpectedTagActionEnum.Error;
 
         /// <summary>
         /// Runs the task as configured
@@ -60,118 +52,173 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild
         {
             if (InputXml.Length == 0)
             {
-                Log.LogError("InputXml cannot be empty");
+                Log.LogError($"{nameof(InputXml)} cannot be empty.");
+                return false;
             }
-            else
+
+            if (File.Exists(TargetDocumentDirPath.ItemSpec))
             {
-                UpdateParametersFromInput();
-                if (MergeFiles && (null == OutputFile))
+                Log.LogError($"{nameof(TargetDocumentDirPath)} must be a directory, not a file.");
+                return false;
+            }
+
+            if (File.Exists(SourceDocumentDirPath.ItemSpec))
+            {
+                Log.LogError($"{nameof(SourceDocumentDirPath)} must be a directory, not a file.");
+                return false;
+            }
+
+            if (!Directory.Exists(SourceDocumentDirPath.ItemSpec))
+            {
+                Log.LogError($"{nameof(SourceDocumentDirPath)} directory does not exist.");
+                return false;
+            }
+
+            var markdownSourceDocuments = Directory.EnumerateFiles(SourceDocumentDirPath.ItemSpec, "*.md")
+                .Select(f => GetSourceDocument(f))
+                .ToList();
+
+            //try for several sources of header data
+            IEnumerable<TransformationInput> sourceDocumentsToExecute = null;
+            //check for YAML-header files
+            var sourceDocsWithYaml = markdownSourceDocuments.Where(doc =>
+                doc.Options != null
+            );
+            if (sourceDocsWithYaml.Count() > 0)
+            {
+                sourceDocumentsToExecute = sourceDocsWithYaml.Select(src
+                    => new TransformationInput() { SourceDocument = src, InputXml = InputXml }
+                );
+            }
+
+            if (sourceDocumentsToExecute == null)
+            {
+                //try check Readme file
+                var readmeSourceDocument = markdownSourceDocuments.SingleOrDefault(src =>
+                    Path.GetFileNameWithoutExtension(src.FileName)
+                    .Equals("Readme", StringComparison.OrdinalIgnoreCase)
+                );
+                if (readmeSourceDocument != null)
                 {
-                    Log.LogError("OutputFile must be specified if input files are merged");
+                    sourceDocumentsToExecute = new[] {
+                        new TransformationInput() { SourceDocument = readmeSourceDocument, InputXml = InputXml }
+                    };
                 }
-                else if (DocumentationPathIsFile && InputXml.Length != 1)
+            }
+
+            if (sourceDocumentsToExecute == null)
+            {
+                //try check for filename match
+                var matchedNameInputs = markdownSourceDocuments.Join(
+                    InputXml,
+                    src => Path.GetFileNameWithoutExtension(src.FileName),
+                    xml => Path.GetFileNameWithoutExtension(xml.ItemSpec),
+                    (src, xml) => new TransformationInput() { SourceDocument = src, InputXml = new[] { xml } }
+                );
+                if (matchedNameInputs.Count() > 0)
                 {
-                    Log.LogError("DocumentationPath must specify a directory if more than one input XML value is supplied");
+                    sourceDocumentsToExecute = matchedNameInputs;
                 }
-                else
+            }
+
+            if (sourceDocumentsToExecute == null)
+            {
+                //try create dummies source file, use matching name to xml file
+                sourceDocumentsToExecute = InputXml.Select(xml => new TransformationInput()
                 {
-                    try
+                    InputXml = new[] { xml },
+                    SourceDocument = new SourceDocument()
                     {
-                        CreateDirectoryIfNeeded();
-                        GenerateFiles();
-                        if (MergeFiles)
-                        {
-                            Merge();
-                        }
-                        return true;
+                        Body = string.Empty,
+                        Options = null,
+                        FileName = Path.GetFileNameWithoutExtension(xml.ItemSpec)
                     }
-                    catch (Exception ex)
-                    {
-                        LoggedException = ex;
-                        Log.LogErrorFromException(ex);
-                    }
-                }
+                });
+            }
+
+            try
+            {
+                GenerateFiles(sourceDocumentsToExecute);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LoggedException = ex;
+                Log.LogErrorFromException(ex);
             }
             return false;
         }
 
         /// <summary>
-        /// This updates the tag and merge parameters based on the input front matter
+        /// Load a Markdown file and parse out its Yaml header if any, building a SourceDocument object
         /// </summary>
-        public void UpdateParametersFromInput()
+        /// <param name="fileName">A Markdown file with a PanDoc-style YAML header.</param>
+        /// <returns>A SourceDocument object. Options is null </returns>
+        public SourceDocument GetSourceDocument(string fileName)
         {
-            if(DocumentationPathIsFile)
+            GetFileSections(fileName, out string frontMatter, out string body);
+            return new SourceDocument()
             {
-                if (TryGetFrontMatter(DocumentationPath.ItemSpec, out string frontMatter, out bool isEmpty) && 
-                    (!isEmpty))
-                {
-                    ReadOptionsFromString(frontMatter);
-                    return;
-                }
-            }
-            else
-            {
-                var mdFiles = Directory.EnumerateFiles(DocumentationPath.ItemSpec, "*.md", SearchOption.AllDirectories).ToList();
-                foreach (var mdFile in mdFiles)
-                {
-                    if (TryGetFrontMatter(mdFile, out string frontMatter, out bool isEmpty) &&
-                    (!isEmpty))
-                    {
-                        ReadOptionsFromString(frontMatter);
-                        return;
-                    }
-                }
-            }
+                Options = ReadOptionsFromString(frontMatter),
+                FileName = fileName,
+                Body = body
+            };
         }
 
         /// <summary>
         /// Use this to handle front matter in markdown files
         /// </summary>
         /// <param name="filePath">the path to the file</param>
-        /// <param name="frontMatter">the front matter found</param>
-        /// <param name="isEmpty">whether the front matter found is trivial</param>
+        /// <param name="frontMatter">the front matter found.  Empty string if missing or trivial.</param>
+        /// <param name="body">the body of the source document</param>
         /// <returns>true if front matter indicator(s) are found</returns>
-        public static bool TryGetFrontMatter(string filePath, out string frontMatter, out bool isEmpty)
+        public static void GetFileSections(string filePath, out string frontMatter, out string body)
         {
             var lines = File.ReadLines(filePath);
-            var firstDashedLine = lines.FirstOrDefault() ?? string.Empty;
-            if (firstDashedLine.StartsWith("---"))
+            var firstLine = lines.FirstOrDefault() ?? string.Empty;
+            var yamlLinesCount = 0;
+
+            if (firstLine.StartsWith("---")) //yaml start
             {
-                var followingLines = lines.Skip(1).TakeWhile(line => !line.StartsWith("---")).ToList();
-                if(followingLines.Count == 0)
+                var yamlSB = new StringBuilder();
+                yamlLinesCount = 1;
+                foreach (var line in lines)
                 {
-                    frontMatter = firstDashedLine;
-                    isEmpty = true;
-                    return true;
+                    if (line.StartsWith("---") && yamlLinesCount > 1)
+                    {
+                        break;
+                    }
+                    yamlSB.AppendLine(line);
+                    yamlLinesCount += 1;
                 }
-                else
-                {
-                    followingLines.Insert(0, firstDashedLine);
-                    frontMatter = String.Join(Environment.NewLine, followingLines);
-                    isEmpty = false;
-                    return true;
-                }
+                
+                frontMatter = yamlSB.ToString();
             }
-            frontMatter = string.Empty;
-            isEmpty = true;
-            return false;
+            else
+            {
+                frontMatter = string.Empty;
+            }
+            body = String.Join(Environment.NewLine, lines.Skip(yamlLinesCount));
         }
 
-        private void ReadOptionsFromString(string frontMatter)
+        private static readonly Regex EmptyFrontMatterRegex
+            = new Regex(@"---\s+");
+        private YamlOptions ReadOptionsFromString(string frontMatter)
         {
+            //HACK: Yaml deserializer continues a simple ---\r\n\ to *not* be a valid YAML doc.
+            //we want to consider that a valid YAML doc.
+            if(EmptyFrontMatterRegex.IsMatch(frontMatter))
+            {
+                return new YamlOptions();
+            }
+
             var input = new StringReader(frontMatter);
             var deserializer = new DeserializerBuilder()
                 .WithNamingConvention(new CamelCaseNamingConvention())
+                .IgnoreUnmatchedProperties()
                 .Build();
             var options = deserializer.Deserialize<YamlOptions>(input);
-            MergeFiles = options.MergeXmlComments;
-            if(Enum.TryParse<AllowedTagOptions>(options.AllowedCustomTags, true, 
-                    out AllowedTagOptions result))
-            {
-                //warn (rather than treat as error condition)
-                //if user indicates one of the two currently used options
-                WarnOnUnexpectedTag = result == AllowedTagOptions.All;
-            }
+            return options;
         }
 
         /// <summary>
@@ -180,93 +227,40 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild
         /// </summary>
         public Exception LoggedException { get; set; }
 
-        private void Merge()
+        private void GenerateFiles(IEnumerable<TransformationInput> inputs)
         {
-            //get all md files in Documentation Path
-            //except those generated in this task
-            var otherMDFiles = Directory.EnumerateFiles(DocumentationPath.ItemSpec, "*.md", SearchOption.AllDirectories).ToList();
-            otherMDFiles = otherMDFiles.Except(GeneratedMDFiles).ToList();
-            var mergeInto = otherMDFiles.FirstOrDefault();
-            if (null == mergeInto)
-            {
-                mergeInto = GeneratedMDFiles.First();
-                File.Copy(mergeInto, OutputFile.ItemSpec, true);
-                foreach (var mdFile in GeneratedMDFiles.Skip(1))
-                {
-                    File.AppendAllText(OutputFile.ItemSpec, Environment.NewLine);
-                    File.AppendAllText(OutputFile.ItemSpec, File.ReadAllText(mdFile));
-                }
-            }
-            else
-            {
-                File.Copy(mergeInto, OutputFile.ItemSpec, true);
-                foreach (var mdFile in otherMDFiles.Skip(1))
-                {
-                    File.AppendAllText(OutputFile.ItemSpec, Environment.NewLine);
-                    File.AppendAllText(OutputFile.ItemSpec, File.ReadAllText(mdFile));
-                }
-                foreach (var mdFile in GeneratedMDFiles)
-                {
-                    File.AppendAllText(OutputFile.ItemSpec, Environment.NewLine);
-                    File.AppendAllText(OutputFile.ItemSpec, File.ReadAllText(mdFile));
-                }
-            }
-        }
+            var groupedInputs = inputs.GroupBy(input => input.RelativeOutputPath, StringComparer.OrdinalIgnoreCase);
 
-        private void GenerateFiles()
-        {
-            foreach (var inputFile in InputXml)
+            foreach (var inputGroup in groupedInputs)
             {
-                try
+                var relativeOutputPath = inputGroup.Key;
+                var fullOutputPath = Path.Combine(TargetDocumentDirPath.ItemSpec, relativeOutputPath);
+                Directory.CreateDirectory(Path.GetDirectoryName(fullOutputPath));
+
+                var inputsForOutput = inputGroup.OrderBy(i => i.MergeSequence, CrudeNaturalSort.Instance);
+                using (var sw = new StreamWriter(fullOutputPath))
                 {
-                    var mdOutput = OutputPath(inputFile.ItemSpec);
-                    GeneratedMDFiles.Add(mdOutput);
-                    var sr = new StreamReader(inputFile.ItemSpec);
-                    using (var sw = new StreamWriter(mdOutput))
+                    foreach (var input in inputsForOutput)
                     {
-                        var xml = sr.ReadToEnd();
-                        var doc = XDocument.Parse(xml);
-                        var md = doc.Root.ToMarkDown();
-                        sw.Write(md);
-                        sw.Close();
+                        sw.WriteLine(input.SourceDocument.Body);
+                        foreach (var inputXml in input.InputXml)
+                        {
+                            var context = new ConversionContext() {
+                                AssemblyName = Path.GetFileNameWithoutExtension(inputXml.ItemSpec),
+                                UnexpectedTagAction = UnexpectedTagAction,
+                                WarningLogger = new BuildMessageWarningLogger(Log)
+                            };
+
+                            using (var sr = new StreamReader(inputXml.ItemSpec))
+                            {
+                                var xml = sr.ReadToEnd();
+                                var doc = XDocument.Parse(xml);
+                                var md = doc.Root.ToMarkDown(context);
+                                sw.WriteLine(md);
+                            }
+                        }                      
                     }
-                }catch(XmlException xmlException)
-                {
-                    if(WarnOnUnexpectedTag && null != xmlException.InnerException && 
-                        xmlException.InnerException.GetType() == typeof(KeyNotFoundException))
-                    {
-                        Log.LogWarningFromException(xmlException);
-                        continue;
-                    }
-                    throw;
                 }
-            }
-        }
-
-        private string OutputPath(string inputXml)
-        {
-            if (DocumentationPathIsFile)
-            {
-                return DocumentationPath.ItemSpec;
-            }
-            return $@"{DocumentationPath.ItemSpec}\{Path.GetFileNameWithoutExtension(inputXml)}.md";
-        }
-
-        private bool DocumentationPathIsFile
-        {
-            get { return File.Exists(DocumentationPath.ItemSpec); }
-        }
-
-        /// <summary>
-        /// The files generated during execution of the task
-        /// </summary>
-        public List<string> GeneratedMDFiles { get; private set; } = new List<string>();
-
-        private void CreateDirectoryIfNeeded()
-        {
-            if ((!DocumentationPathIsFile) && (!Directory.Exists(DocumentationPath.ItemSpec)))
-            {
-                Directory.CreateDirectory(DocumentationPath.ItemSpec);
             }
         }
     }

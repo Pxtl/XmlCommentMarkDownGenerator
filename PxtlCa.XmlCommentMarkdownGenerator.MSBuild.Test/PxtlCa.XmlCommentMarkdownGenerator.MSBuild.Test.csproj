@@ -49,8 +49,8 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
-  <Choose>    
-  <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
+  <Choose>
+    <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
       <ItemGroup>
         <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
       </ItemGroup>
@@ -68,15 +68,16 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Docs\Notes.md">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PxtlCa.XmlCommentMarkDownGenerator.MSBuild\PxtlCa.XmlCommentMarkDownGenerator.MSBuild.csproj">
       <Project>{9fcee209-508f-474e-80c2-d0966e4aa126}</Project>
       <Name>PxtlCa.XmlCommentMarkDownGenerator.MSBuild</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PxtlCa.XmlCommentMarkDownGenerator.Test\PxtlCa.XmlCommentMarkDownGenerator.Test.csproj">
+      <Project>{7993d07f-7f81-477e-aba1-e3e6dc5cab6a}</Project>
+      <Name>PxtlCa.XmlCommentMarkDownGenerator.Test</Name>
     </ProjectReference>
     <ProjectReference Include="..\PxtlCa.XmlCommentMarkDownGenerator\PxtlCa.XmlCommentMarkDownGenerator.csproj">
       <Project>{1375dc94-03f8-496c-981c-d5d6e1b0fd26}</Project>

@@ -9,8 +9,10 @@
     />
     <GenerateMarkdown 
       InputXml="$(MSBuildProjectDirectory)\$(OutputPath)\$(AssemblyName).xml"
-      DocumentationPath="$(MSBuildProjectDirectory)\Docs"
+      SourceDocumentDirPath="$(MSBuildProjectDirectory)"
+      TargetDocumentDirPath="$(MSBuildProjectDirectory)\..\Docs"
       MergeFiles="true"
+      UnexpectedTagAction="warning"
       OutputFile="$(MSBuildProjectDirectory)\Readme.md"
     />
   </Target>
