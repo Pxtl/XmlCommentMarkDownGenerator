@@ -8,20 +8,6 @@ using YamlDotNet.Serialization;
 namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild.Options
 {
     /// <summary>
-    /// Specifies the manner in which custom tags will be handled
-    /// </summary>
-    public enum AllowedTagOptions
-    { 
-        /// <summary>
-        /// All custom tags are allowed
-        /// </summary>
-        All,
-        /// <summary>
-        /// No custom tags are allowed
-        /// </summary>
-        None
-    }
-    /// <summary>
     /// The options to be deserialized from the front matter found.
     /// </summary>
     public class YamlOptions
@@ -29,6 +15,10 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild.Options
         [YamlMember(Alias = "MergeXmlComments", ApplyNamingConventions = false)]
         public bool MergeXmlComments { get; set; }
         [YamlMember(Alias = "AllowedCustomTags", ApplyNamingConventions = false)]
-        public string AllowedCustomTags { get; set; }
+        public string UnexpectedTagAction { get; set; }
+        //[YamlMember(Alias = "Namespaces", ApplyNamingConventions = false)]
+        //public string Namespaces { get; set; }
+        [YamlMember(Alias = "OutputFile", ApplyNamingConventions = false)]
+        public string OutputFile { get; set; }
     }
 }

@@ -47,10 +47,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConversionContext.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TagRenderers.cs" />
+    <Compile Include="UnexpectedTagActionEnum.cs" />
+    <Compile Include="IWarningLogger.cs" />
     <Compile Include="XmlToMarkDown.cs" />
   </ItemGroup>
   <ItemGroup>

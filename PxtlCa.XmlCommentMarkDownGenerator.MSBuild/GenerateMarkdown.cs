@@ -48,7 +48,7 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild
         /// Defaults to false. When true unexpected tags in the documentation
         /// will generate warnings rather than errors. 
         /// </summary>
-        public bool WarnOnUnexpectedTag { get; set; } = false;
+        public UnexpectedTagActionEnum UnexpectedTagAction { get; set; } = UnexpectedTagActionEnum.Error;
 
       
 
@@ -165,12 +165,14 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild
                 .Build();
             var options = deserializer.Deserialize<YamlOptions>(input);
             MergeFiles = options.MergeXmlComments;
-            if(Enum.TryParse<AllowedTagOptions>(options.AllowedCustomTags, true, 
-                    out AllowedTagOptions result))
+            if(Enum.TryParse<UnexpectedTagActionEnum>(options.UnexpectedTagAction, true, 
+                    out UnexpectedTagActionEnum result))
             {
-                //warn (rather than treat as error condition)
-                //if user indicates one of the two currently used options
-                WarnOnUnexpectedTag = result == AllowedTagOptions.All;
+                UnexpectedTagAction = result;
+            }
+            if (!string.IsNullOrEmpty(options.OutputFile))
+            {
+                OutputFile = new TaskItem(options.OutputFile);
             }
         }
 
@@ -217,28 +219,17 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild
         {
             foreach (var inputFile in InputXml)
             {
-                try
+                var mdOutput = OutputPath(inputFile.ItemSpec);
+                GeneratedMDFiles.Add(mdOutput);
+                var sr = new StreamReader(inputFile.ItemSpec);
+                using (var sw = new StreamWriter(mdOutput))
                 {
-                    var mdOutput = OutputPath(inputFile.ItemSpec);
-                    GeneratedMDFiles.Add(mdOutput);
-                    var sr = new StreamReader(inputFile.ItemSpec);
-                    using (var sw = new StreamWriter(mdOutput))
-                    {
-                        var xml = sr.ReadToEnd();
-                        var doc = XDocument.Parse(xml);
-                        var md = doc.Root.ToMarkDown();
-                        sw.Write(md);
-                        sw.Close();
-                    }
-                }catch(XmlException xmlException)
-                {
-                    if(WarnOnUnexpectedTag && null != xmlException.InnerException && 
-                        xmlException.InnerException.GetType() == typeof(KeyNotFoundException))
-                    {
-                        Log.LogWarningFromException(xmlException);
-                        continue;
-                    }
-                    throw;
+                    var xml = sr.ReadToEnd();
+                    var doc = XDocument.Parse(xml);
+                    var context = new ConversionContext() { UnexpectedTagAction = UnexpectedTagAction, WarningLogger = new BuildMessageWarningLogger(Log) };
+                    var md = doc.Root.ToMarkDown(context);
+                    sw.Write(md);
+                    sw.Close();
                 }
             }
         }

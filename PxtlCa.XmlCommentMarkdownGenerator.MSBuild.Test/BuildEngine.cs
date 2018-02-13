@@ -104,7 +104,7 @@ namespace PxtlCa.XmlCommentMarkdownGenerator.MSBuild.Test
             var toAlter = File.ReadAllText(inputPath);
             toAlter = toAlter.Replace(@"<returns>", @"<returns><inheritdoc>X</inheritdoc>");
 
-            var alteredPath = inputPath.Replace("MSBuild.xml", "MSBuild_altered.xml");
+            var alteredPath = inputPath.Replace("MSBuild.xml", "MSBuild_alteredHandled.xml");
             File.WriteAllText(alteredPath, toAlter);
 
             var docPath = @"Docs";
@@ -122,7 +122,7 @@ namespace PxtlCa.XmlCommentMarkdownGenerator.MSBuild.Test
                 DocumentationPath = documentPath,
                 InputXml = inputXml,
                 MergeFiles = merge,
-                WarnOnUnexpectedTag = true,
+                UnexpectedTagAction = XmlCommentMarkDownGenerator.UnexpectedTagActionEnum.Accept,
                 OutputFile = outputFile
             };
 
@@ -153,7 +153,7 @@ namespace PxtlCa.XmlCommentMarkdownGenerator.MSBuild.Test
             var toAlter = File.ReadAllText(inputPath);
             toAlter = toAlter.Replace(@"<returns>", @"<returns><inheritdoc>X</inheritdoc>");
 
-            var alteredPath = inputPath.Replace("MSBuild.xml", "MSBuild_altered.xml");
+            var alteredPath = inputPath.Replace("MSBuild.xml", "MSBuild_alteredError.xml");
             File.WriteAllText(alteredPath, toAlter);
 
             var docPath = @"Docs";
@@ -172,7 +172,7 @@ namespace PxtlCa.XmlCommentMarkdownGenerator.MSBuild.Test
                 InputXml = inputXml,
                 MergeFiles = merge,
                 OutputFile = outputFile,
-                WarnOnUnexpectedTag = false
+                UnexpectedTagAction = XmlCommentMarkDownGenerator.UnexpectedTagActionEnum.Error
             };
 
             task.Execute();

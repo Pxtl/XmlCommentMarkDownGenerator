@@ -29,7 +29,8 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
                 {
                     var xml = inReader.ReadToEnd();
                     var doc = XDocument.Parse(xml);
-                    var md = doc.Root.ToMarkDown();
+                    var context = new ConversionContext() { UnexpectedTagAction = options.UnexpectedTagAction, WarningLogger = new TextWriterWarningLogger(Console.Error) };
+                    var md = doc.Root.ToMarkDown(context);
                     outWriter.Write(md);
                     outWriter.Close();
                 }

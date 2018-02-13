@@ -14,7 +14,7 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
         {
             var xdoc = XDocument.Parse(e);
             return xdoc
-                .ToMarkDown()
+                .ToMarkDown(new ConversionContext { UnexpectedTagAction = UnexpectedTagActionEnum.Error, WarningLogger = new TextWriterWarningLogger(Console.Error) })
                 .RemoveRedundantLineBreaks();
         }
 
@@ -22,7 +22,7 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
         {
             var xdoc = XDocument.Load(e);
             return xdoc
-                .ToMarkDown()
+                .ToMarkDown(new ConversionContext { UnexpectedTagAction = UnexpectedTagActionEnum.Error, WarningLogger = new TextWriterWarningLogger(Console.Error) })
                 .RemoveRedundantLineBreaks();
         }
 
@@ -34,7 +34,13 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
             ["M:"] = "Method",
         };
 
-        public static string ToMarkDown(this XNode node, string assemblyName = null)
+        /// <summary>
+        /// Write out the given XML Node as Markdown. Recursive function used internally.
+        /// </summary>
+        /// <param name="node">The xml node to write out.</param>
+        /// <param name="ConversionContext">The Conversion Context that will be passed around and manipulated over the course of the translation.</param>
+        /// <returns>The converted markdown text.</returns>
+        public static string ToMarkDown(this XNode node, ConversionContext context)
         {
             if(node is XDocument)
             {
@@ -72,13 +78,25 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
                 }
 
                 try { 
-                    var vals = TagRenderer.Dict[name].ValueExtractor(el, assemblyName).ToArray();
+                    var vals = TagRenderer.Dict[name].ValueExtractor(el, context).ToArray();
                     return string.Format(TagRenderer.Dict[name].FormatString, args: vals);
                 }
                 catch(KeyNotFoundException ex)
                 {
                     var lineInfo = (IXmlLineInfo)node;
-                    throw new XmlException($@"Unknown element type ""{ name }""", ex, lineInfo.LineNumber, lineInfo.LinePosition);
+                    switch(context.UnexpectedTagAction)
+                    {
+                        case UnexpectedTagActionEnum.Error:
+                            throw new XmlException($@"Unknown element type ""{ name }""", ex, lineInfo.LineNumber, lineInfo.LinePosition);
+                        case UnexpectedTagActionEnum.Warn:
+                            context.WarningLogger.LogWarning($@"Unknown element type ""{ name }"" on line {lineInfo.LineNumber}, pos {lineInfo.LinePosition}");
+                            break;
+                        case UnexpectedTagActionEnum.Accept:
+                            //do nothing;
+                            break;
+                        default:
+                            throw new InvalidOperationException($"Unexpected {nameof(UnexpectedTagActionEnum)}");
+                    }
                 }
             }
 
@@ -91,30 +109,30 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
 
         private static readonly Regex _PrefixReplacerRegex = new Regex(@"(^[A-Z]\:)");
 
-        internal static string[] ExtractNameAndBodyFromMember(XElement node, string assemblyName)
+        internal static string[] ExtractNameAndBodyFromMember(XElement node, ConversionContext context)
         {
-            var newName = Regex.Replace(node.Attribute("name").Value, $@":{Regex.Escape(assemblyName)}\.", ":"); //remove leading namespace if it matches the assembly name
+            var newName = Regex.Replace(node.Attribute("name").Value, $@":{Regex.Escape(context.AssemblyName)}\.", ":"); //remove leading namespace if it matches the assembly name
             //TODO: do same for function parameters
             newName = _PrefixReplacerRegex.Replace(newName, match => _MemberNamePrefixDict[match.Value] + " "); //expand prefixes into more verbose words for member.
             return new[]
                {
                     newName,
-                    node.Nodes().ToMarkDown(assemblyName)
+                    node.Nodes().ToMarkDown(context)
                 };
         }
 
-        internal static string[] ExtractNameAndBody(string att, XElement node, string assemblyName)
+        internal static string[] ExtractNameAndBody(string att, XElement node, ConversionContext context)
         {
             return new[]
                {
                     node.Attribute(att)?.Value,
-                    node.Nodes().ToMarkDown(assemblyName)
+                    node.Nodes().ToMarkDown(context)
                 };
         }
 
-        internal static string ToMarkDown(this IEnumerable<XNode> es, string assemblyName = null)
+        internal static string ToMarkDown(this IEnumerable<XNode> es, ConversionContext context)
         {
-            return es.Aggregate("", (current, x) => current + x.ToMarkDown(assemblyName));
+            return es.Aggregate("", (current, x) => current + x.ToMarkDown(context));
         }
 
         internal static string ToCodeBlock(this string s)
