@@ -28,19 +28,15 @@ namespace PxtlCa.XmlCommentMarkdownGenerator.MSBuild.Test
             var inputPath = @"..\..\..\PxtlCa.XmlCommentMarkdownGenerator.MSBuild\bin\Debug\PxtlCa.XmlCommentMarkDownGenerator.MSBuild.xml";
             var docPath = @"Docs";
             var outputFile = new TaskItem(@"..\..\Readme.md");
-
             
             var inputXml = new ITaskItem[] { new TaskItem(inputPath) };
             var documentPath = new TaskItem(docPath);
-            var merge = true;
 
             var task = new GenerateMarkdown
             {
                 BuildEngine = buildEngine,
-                DocumentationPath = documentPath,
-                InputXml = inputXml,
-                MergeFiles = merge,
-                OutputFile = outputFile
+                TargetDocumentDirPath = documentPath,
+                InputXml = inputXml
             };
 
             task.Execute();
@@ -66,15 +62,12 @@ namespace PxtlCa.XmlCommentMarkdownGenerator.MSBuild.Test
 
             var inputXml = new ITaskItem[] { new TaskItem(inputPath) };
             var documentPath = new TaskItem(docPath);
-            var merge = true;
 
             var task = new GenerateMarkdown
             {
                 BuildEngine = buildEngine,
-                DocumentationPath = documentPath,
-                InputXml = inputXml,
-                MergeFiles = merge,
-                OutputFile = outputFile
+                TargetDocumentDirPath = documentPath,
+                InputXml = inputXml
             };
 
             task.Execute();
@@ -114,16 +107,13 @@ namespace PxtlCa.XmlCommentMarkdownGenerator.MSBuild.Test
             var inputXml = new ITaskItem[] { new TaskItem(alteredPath) };
 
             var documentPath = new TaskItem(docPath);
-            var merge = true;
 
             var task = new GenerateMarkdown
             {
                 BuildEngine = buildEngine,
-                DocumentationPath = documentPath,
+                TargetDocumentDirPath = documentPath,
                 InputXml = inputXml,
-                MergeFiles = merge,
-                UnexpectedTagAction = XmlCommentMarkDownGenerator.UnexpectedTagActionEnum.Accept,
-                OutputFile = outputFile
+                UnexpectedTagAction = XmlCommentMarkDownGenerator.UnexpectedTagActionEnum.Accept
             };
 
             task.Execute();
@@ -159,19 +149,15 @@ namespace PxtlCa.XmlCommentMarkdownGenerator.MSBuild.Test
             var docPath = @"Docs";
             var outputFile = new TaskItem(@"..\..\Readme.md");
 
-
             var inputXml = new ITaskItem[] { new TaskItem(alteredPath) };
 
             var documentPath = new TaskItem(docPath);
-            var merge = true;
 
             var task = new GenerateMarkdown
             {
                 BuildEngine = buildEngine,
-                DocumentationPath = documentPath,
+                TargetDocumentDirPath = documentPath,
                 InputXml = inputXml,
-                MergeFiles = merge,
-                OutputFile = outputFile,
                 UnexpectedTagAction = XmlCommentMarkDownGenerator.UnexpectedTagActionEnum.Error
             };
 
@@ -208,21 +194,19 @@ namespace PxtlCa.XmlCommentMarkdownGenerator.MSBuild.Test
 
         private static bool TryUpdateFile(bool mergeDirectiveInserted, string mdFile)
         {
-            if (GenerateMarkdown.TryGetFrontMatter(mdFile, out string frontMatter, out bool isEmpty))
+            GenerateMarkdown.GetFileSections(mdFile, out string frontMatter, out string body);
+            if(string.IsNullOrWhiteSpace(frontMatter))
             {
-                if (isEmpty)
-                {
-                    //get all the lines starting with the second "---" line
-                    var lines = File.ReadLines(mdFile).Skip(1).ToList();
-                    //now insert the front matter in reverse order
-                    lines.Insert(0, "AllowedCustomTags: all");
-                    lines.Insert(0, "MergeXmlComments: false");
-                    lines.Insert(0, "---");
-                    //overwrite the file with the update
-                    File.WriteAllText(mdFile, string.Join(Environment.NewLine, lines));
-                    //stop any additional preprocesssing
-                    mergeDirectiveInserted = true;
-                }
+                //get all the lines starting with the second "---" line
+                var lines = File.ReadLines(mdFile).Skip(1).ToList();
+                //now insert the front matter in reverse order
+                lines.Insert(0, "AllowedCustomTags: all");
+                lines.Insert(0, "MergeXmlComments: false");
+                lines.Insert(0, "---");
+                //overwrite the file with the update
+                File.WriteAllText(mdFile, string.Join(Environment.NewLine, lines));
+                //stop any additional preprocesssing
+                mergeDirectiveInserted = true;
             }
 
             return mergeDirectiveInserted;
