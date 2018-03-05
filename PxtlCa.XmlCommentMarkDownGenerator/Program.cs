@@ -22,7 +22,7 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
                 var inReader = options.ConsoleIn
                     ? Console.In
                     : new StreamReader(options.InputFile);
-                using (var outWriter = options.ConsoleIn
+                using (var outWriter = options.ConsoleOut
                     ? Console.Out
                     : new StreamWriter(options.OutputFile)
                     )
