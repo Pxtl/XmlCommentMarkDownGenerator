@@ -84,8 +84,7 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
 
 
             if (node.NodeType == XmlNodeType.Text)
-                return Regex.Replace(((XText)node).Value.Replace('\n', ' '), @"\s+", " ");
-
+                return Regex.Replace(((XText)node).Value.Replace(@"            ", ""), @"^\n|[S*|\n]$","",RegexOptions.Multiline);
             return "";
         }
 
