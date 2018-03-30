@@ -61,7 +61,6 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild.Test
             PrepareInputDocsDirectory("Notes", @"
 ---
 UnexpectedTagAction: None
-MergeXmlComments: false
 ---
 ## No Documentation Yet Authored
 ");

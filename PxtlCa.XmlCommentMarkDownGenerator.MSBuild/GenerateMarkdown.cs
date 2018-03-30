@@ -11,6 +11,7 @@ using System.Xml;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 using PxtlCa.XmlCommentMarkDownGenerator.MSBuild.Options;
+using System.Text.RegularExpressions;
 
 namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild
 {
@@ -174,41 +175,50 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild
         public static void GetFileSections(string filePath, out string frontMatter, out string body)
         {
             var lines = File.ReadLines(filePath);
-            var firstDashedLine = lines.FirstOrDefault() ?? string.Empty;
-            var yamlEndIndex = 0;
-            if (firstDashedLine.StartsWith("---")) //yaml start
-            {
-                var yamlLines = lines
-                    .Skip(1)
-                    .TakeWhile((line, i) =>
-                    {
-                        yamlEndIndex = i;
-                        return !line.StartsWith("---");//yaml end
-                    })
-                    .ToList();
+            var firstLine = lines.FirstOrDefault() ?? string.Empty;
+            var yamlLinesCount = 0;
 
-                if(yamlLines.Count == 0)
+            if (firstLine.StartsWith("---")) //yaml start
+            {
+                var yamlSB = new StringBuilder();
+                yamlLinesCount = 1;
+                foreach (var line in lines)
                 {
-                    frontMatter = null;
+                    if (line.StartsWith("---") && yamlLinesCount > 1)
+                    {
+                        break;
+                    }
+                    yamlSB.AppendLine(line);
+                    yamlLinesCount += 1;
                 }
-                else
-                {
-                    yamlLines.Insert(0, firstDashedLine);
-                    frontMatter = String.Join(Environment.NewLine, yamlLines);
-                }
+                
+                frontMatter = yamlSB.ToString();
             }
-            frontMatter = string.Empty;
-            body = String.Join(Environment.NewLine, lines.Skip(yamlEndIndex));
+            else
+            {
+                frontMatter = string.Empty;
+            }
+            body = String.Join(Environment.NewLine, lines.Skip(yamlLinesCount));
         }
 
+        private static readonly Regex EmptyFrontMatterRegex
+            = new Regex(@"---\s+");
         private YamlOptions ReadOptionsFromString(string frontMatter)
         {
+            //HACK: Yaml deserializer continues a simple ---\r\n\ to *not* be a valid YAML doc.
+            //we want to consider that a valid YAML doc.
+            if(EmptyFrontMatterRegex.IsMatch(frontMatter))
+            {
+                return new YamlOptions();
+            }
+
             var input = new StringReader(frontMatter);
             var deserializer = new DeserializerBuilder()
                 .WithNamingConvention(new CamelCaseNamingConvention())
                 .IgnoreUnmatchedProperties()
                 .Build();
-            return deserializer.Deserialize<YamlOptions>(input);
+            var options = deserializer.Deserialize<YamlOptions>(input);
+            return options;
         }
 
         /// <summary>
