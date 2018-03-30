@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Tasks;
 using Microsoft.Build.Utilities;
-using PxtlCa.XmlCommentMarkdownGenerator;
+using PxtlCa.XmlCommentMarkDownGenerator;
 using PxtlCa.XmlCommentMarkDownGenerator.MSBuild;
 using Rhino.Mocks;
 using System.IO;
@@ -12,50 +12,63 @@ using System.Xml.XPath;
 using System.Xml;
 using System.Linq;
 
-namespace PxtlCa.XmlCommentMarkdownGenerator.MSBuild.Test
+namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild.Test
 {
     [TestClass]
     public class BuildEngine
     {
         [TestMethod]
-        [DeploymentItem("Docs")]
-        public void ExecuteMerge()
+        public void GetRegressionString()
         {
-            PrepareDocsDirectory();
+        }
+
+        [TestMethod]
+        public void ExecuteDefaultMerge()
+        {
+            var defaultMergeSearchText = "DefaultMergeSearchHeaderText";
+            PrepareInputDocsDirectory("Notes", $@"
+---
+---
+## {defaultMergeSearchText}
+".Trim());
+            PrepareStandardOutputDocsDirectory();
             var mockRepo = new MockRepository();
             var buildEngine = mockRepo.Stub<IBuildEngine>();
 
-            var inputPath = @"..\..\..\PxtlCa.XmlCommentMarkdownGenerator.MSBuild\bin\Debug\PxtlCa.XmlCommentMarkDownGenerator.MSBuild.xml";
-            var docPath = @"Docs";
-            var outputFile = new TaskItem(@"..\..\Readme.md");
+            var xmlFileName = "DefaultMerge.xml";
+            File.WriteAllText(xmlFileName, PxtlCa.XmlCommentMarkDownGenerator.Test.Util.Helper.GetRegressionTestXml());
             
-            var inputXml = new ITaskItem[] { new TaskItem(inputPath) };
-            var documentPath = new TaskItem(docPath);
-
             var task = new GenerateMarkdown
             {
                 BuildEngine = buildEngine,
-                TargetDocumentDirPath = documentPath,
-                InputXml = inputXml
+                SourceDocumentDirPath = new TaskItem(InputDocsDirectory),
+                TargetDocumentDirPath = new TaskItem(OutputDocsDirectory),
+                InputXml = new ITaskItem[] { new TaskItem(xmlFileName) }
             };
 
             task.Execute();
 
-            var expectFileExists = true;
-            var fileActuallyExists = System.IO.File.Exists(outputFile.ItemSpec);
+            var fileActuallyExists = Directory.EnumerateFiles(OutputDocsDirectory)
+                .Any(f => File.ReadAllText(f).Contains(defaultMergeSearchText));
 
-            Assert.AreEqual(expectFileExists, fileActuallyExists);
+            Assert.IsTrue(fileActuallyExists);
         }
 
         [TestMethod]
         [DeploymentItem("Docs")]
         public void TestAvertMerge()
         {
-            PrepareDocsDirectory(overrideMerge:true);
+            PrepareInputDocsDirectory("Notes", @"
+---
+UnexpectedTagAction: None
+MergeXmlComments: false
+---
+## No Documentation Yet Authored
+");
             var mockRepo = new MockRepository();
             var buildEngine = mockRepo.Stub<IBuildEngine>();
 
-            var inputPath = @"..\..\..\PxtlCa.XmlCommentMarkdownGenerator.MSBuild\bin\Debug\PxtlCa.XmlCommentMarkDownGenerator.MSBuild.xml";
+            var inputPath = @"..\..\..\PxtlCa.XmlCommentMarkDownGenerator.MSBuild\bin\Debug\PxtlCa.XmlCommentMarkDownGenerator.MSBuild.xml";
             var docPath = @"Docs";
             var outputFile = new TaskItem(@"..\..\Readme.md");
 
@@ -89,44 +102,36 @@ namespace PxtlCa.XmlCommentMarkdownGenerator.MSBuild.Test
         [DeploymentItem("Docs")]
         public void HandleUnexpectedTag()
         {
-            PrepareDocsDirectory();
+            PrepareStandardInputDocsDirectory();
+            PrepareStandardOutputDocsDirectory();
             var mockRepo = new MockRepository();
             var buildEngine = mockRepo.Stub<IBuildEngine>();
 
-            var inputPath = @"..\..\..\PxtlCa.XmlCommentMarkdownGenerator.MSBuild\bin\Debug\PxtlCa.XmlCommentMarkDownGenerator.MSBuild.xml";
-            var toAlter = File.ReadAllText(inputPath);
+            var toAlter = PxtlCa.XmlCommentMarkDownGenerator.Test.Util.Helper.GetRegressionTestXml();
             toAlter = toAlter.Replace(@"<returns>", @"<returns><inheritdoc>X</inheritdoc>");
 
-            var alteredPath = inputPath.Replace("MSBuild.xml", "MSBuild_alteredHandled.xml");
+            var alteredPath = @"MSBuild_alteredWarning.xml";
             File.WriteAllText(alteredPath, toAlter);
-
-            var docPath = @"Docs";
-            var outputFile = new TaskItem(@"..\..\Readme.md");
-
-
-            var inputXml = new ITaskItem[] { new TaskItem(alteredPath) };
-
-            var documentPath = new TaskItem(docPath);
 
             var task = new GenerateMarkdown
             {
                 BuildEngine = buildEngine,
-                TargetDocumentDirPath = documentPath,
-                InputXml = inputXml,
-                UnexpectedTagAction = XmlCommentMarkDownGenerator.UnexpectedTagActionEnum.Accept
+                SourceDocumentDirPath = new TaskItem(InputDocsDirectory),
+                TargetDocumentDirPath = new TaskItem(OutputDocsDirectory),
+                InputXml = new ITaskItem[] { new TaskItem(alteredPath) },
+                UnexpectedTagAction = UnexpectedTagActionEnum.Accept
             };
 
             task.Execute();
-
             if (null != task.LoggedException)
             {
                 throw task.LoggedException;
             }
 
             var expectFileExists = true;
-            var fileActuallyExists = System.IO.File.Exists(outputFile.ItemSpec);
+            //var fileActuallyExists = System.IO.File.Exists();
 
-            Assert.AreEqual(expectFileExists, fileActuallyExists);
+            //Assert.AreEqual(expectFileExists, fileActuallyExists);
         }
 
 
@@ -135,81 +140,63 @@ namespace PxtlCa.XmlCommentMarkdownGenerator.MSBuild.Test
         [ExpectedException(typeof(XmlException))]
         public void ExpectedErrorUnexpectedTag()
         {
-            PrepareDocsDirectory();
+            PrepareStandardInputDocsDirectory();
+            PrepareStandardOutputDocsDirectory();
             var mockRepo = new MockRepository();
             var buildEngine = mockRepo.Stub<IBuildEngine>();
 
-            var inputPath = @"..\..\..\PxtlCa.XmlCommentMarkdownGenerator.MSBuild\bin\Debug\PxtlCa.XmlCommentMarkDownGenerator.MSBuild.xml";
-            var toAlter = File.ReadAllText(inputPath);
+            var toAlter = PxtlCa.XmlCommentMarkDownGenerator.Test.Util.Helper.GetRegressionTestXml();
             toAlter = toAlter.Replace(@"<returns>", @"<returns><inheritdoc>X</inheritdoc>");
 
-            var alteredPath = inputPath.Replace("MSBuild.xml", "MSBuild_alteredError.xml");
+            var alteredPath = @"MSBuild_alteredError.xml";
             File.WriteAllText(alteredPath, toAlter);
-
-            var docPath = @"Docs";
-            var outputFile = new TaskItem(@"..\..\Readme.md");
-
-            var inputXml = new ITaskItem[] { new TaskItem(alteredPath) };
-
-            var documentPath = new TaskItem(docPath);
-
+                        
             var task = new GenerateMarkdown
             {
                 BuildEngine = buildEngine,
-                TargetDocumentDirPath = documentPath,
-                InputXml = inputXml,
+                SourceDocumentDirPath = new TaskItem(InputDocsDirectory),
+                TargetDocumentDirPath = new TaskItem(OutputDocsDirectory),
+                InputXml = new ITaskItem[] { new TaskItem(alteredPath) },
                 UnexpectedTagAction = XmlCommentMarkDownGenerator.UnexpectedTagActionEnum.Error
             };
 
             task.Execute();
 
-            if(null != task.LoggedException)
+            if (null != task.LoggedException)
             {
                 throw task.LoggedException;
             }
-            var expectFileExists = true;
-            var fileActuallyExists = System.IO.File.Exists(outputFile.ItemSpec);
-
-            Assert.AreEqual(expectFileExists, fileActuallyExists);
         }
 
-        public static void PrepareDocsDirectory(bool overrideMerge = false)
+        public static void PrepareStandardOutputDocsDirectory()
         {
-            var mergeDirectiveInserted = false;
-            if(Directory.Exists("Docs"))
-            {
-                Directory.Delete("Docs", true);
-            }
-            Directory.CreateDirectory("Docs");
-            var filesToMove = Directory.EnumerateFiles(Environment.CurrentDirectory, "*.md", SearchOption.TopDirectoryOnly).ToList();
-            foreach (var mdFile in filesToMove)
-            {
-                if(overrideMerge && (!mergeDirectiveInserted))
-                {
-                    mergeDirectiveInserted = TryUpdateFile(mergeDirectiveInserted, mdFile);
-                }
-                File.Copy(mdFile, $@".\Docs\{Path.GetFileName(mdFile)}");
-            }
+            PrepareDirectory(OutputDocsDirectory);
+        }
+        public static void PrepareStandardInputDocsDirectory()
+        {
+            PrepareInputDocsDirectory("Notes", @"
+---
+---
+## No Documentation Yet Authored
+");
         }
 
-        private static bool TryUpdateFile(bool mergeDirectiveInserted, string mdFile)
+        public static readonly string OutputDocsDirectory = "OutputDocs";
+        public static readonly string InputDocsDirectory = "InputDocs";
+               
+        public static void PrepareInputDocsDirectory(string mdDocFileNameSansExtension, string mdDocFileBody)
         {
-            GenerateMarkdown.GetFileSections(mdFile, out string frontMatter, out string body);
-            if(string.IsNullOrWhiteSpace(frontMatter))
-            {
-                //get all the lines starting with the second "---" line
-                var lines = File.ReadLines(mdFile).Skip(1).ToList();
-                //now insert the front matter in reverse order
-                lines.Insert(0, "AllowedCustomTags: all");
-                lines.Insert(0, "MergeXmlComments: false");
-                lines.Insert(0, "---");
-                //overwrite the file with the update
-                File.WriteAllText(mdFile, string.Join(Environment.NewLine, lines));
-                //stop any additional preprocesssing
-                mergeDirectiveInserted = true;
-            }
+            PrepareDirectory(InputDocsDirectory);
+            File.WriteAllText($@"{InputDocsDirectory}\{mdDocFileNameSansExtension}.md", mdDocFileBody.Trim());
+        }
 
-            return mergeDirectiveInserted;
+        private static void PrepareDirectory(string directoryName)
+        {
+            if (Directory.Exists(directoryName))
+            {
+                Directory.Delete(directoryName, true);
+            }
+            Directory.CreateDirectory(directoryName);
         }
     }
 }

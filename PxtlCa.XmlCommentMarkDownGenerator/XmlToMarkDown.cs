@@ -10,17 +10,25 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
 {
     public static class XmlToMarkdown
     {
-        public static string ToMarkDown(this string e)
+        public static string ToMarkDown(this string s)
         {
-            var xdoc = XDocument.Parse(e);
+            return s.ToMarkDown(new ConversionContext {
+                UnexpectedTagAction = UnexpectedTagActionEnum.Error
+                , WarningLogger = new TextWriterWarningLogger(Console.Error)
+            });
+        }
+
+        public static string ToMarkDown(this string s, ConversionContext context)
+        {
+            var xdoc = XDocument.Parse(s);
             return xdoc
-                .ToMarkDown(new ConversionContext { UnexpectedTagAction = UnexpectedTagActionEnum.Error, WarningLogger = new TextWriterWarningLogger(Console.Error) })
+                .ToMarkDown(context)
                 .RemoveRedundantLineBreaks();
         }
 
-        public static string ToMarkDown(this Stream e)
+        public static string ToMarkDown(this Stream s)
         {
-            var xdoc = XDocument.Load(e);
+            var xdoc = XDocument.Load(s);
             return xdoc
                 .ToMarkDown(new ConversionContext { UnexpectedTagAction = UnexpectedTagActionEnum.Error, WarningLogger = new TextWriterWarningLogger(Console.Error) })
                 .RemoveRedundantLineBreaks();

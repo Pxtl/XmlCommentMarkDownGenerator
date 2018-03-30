@@ -26,21 +26,20 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild
         public ITaskItem[] InputXml { get; set; }
 
         /// <summary>
-        /// DocumentationPath is the top level directory in which to search for files.
-        /// It is also the path where generated markdown files are created.
+        /// DocumentationPath is the top level directory in which 
+        /// generated markdown files are created.
         /// </summary>
         [Required]
         public ITaskItem TargetDocumentDirPath { get; set; }
 
         /// <summary>
-        /// SourceDocumentDirPath is the top level directory in which to search for files.
+        /// SourceDocumentDirPath is the top level directory in which to search for markdown files.
         /// </summary>
         [Required]
         public ITaskItem SourceDocumentDirPath { get; set; }
 
         /// <summary>
-        /// Defaults to false. When true unexpected tags in the documentation
-        /// will generate warnings rather than errors. 
+        /// Defaults to Error. Event to execute when an unexpected tag is found. 
         /// </summary>
         public UnexpectedTagActionEnum UnexpectedTagAction { get; set; } = UnexpectedTagActionEnum.Error;
 
@@ -79,7 +78,6 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild
                 .ToList();
 
             //try for several sources of header data
-
             IEnumerable<TransformationInput> sourceDocumentsToExecute = null;
             //check for YAML-header files
             var sourceDocsWithYaml = markdownSourceDocuments.Where(doc =>
@@ -248,7 +246,7 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild
                                 var xml = sr.ReadToEnd();
                                 var doc = XDocument.Parse(xml);
                                 var md = doc.Root.ToMarkDown(context);
-                                sw.WriteLine(doc);
+                                sw.WriteLine(md);
                             }
                         }                      
                     }

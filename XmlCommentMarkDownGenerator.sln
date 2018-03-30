@@ -19,7 +19,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PxtlCa.XmlCommentMarkDownGe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PxtlCa.XmlCommentMarkDownGenerator.MSBuild", "PxtlCa.XmlCommentMarkDownGenerator.MSBuild\PxtlCa.XmlCommentMarkDownGenerator.MSBuild.csproj", "{9FCEE209-508F-474E-80C2-D0966E4AA126}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PxtlCa.XmlCommentMarkdownGenerator.MSBuild.Test", "PxtlCa.XmlCommentMarkdownGenerator.MSBuild.Test\PxtlCa.XmlCommentMarkdownGenerator.MSBuild.Test.csproj", "{2358183D-B57C-467D-B89C-16C6BE040753}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PxtlCa.XmlCommentMarkDownGenerator.MSBuild.Test", "PxtlCa.XmlCommentMarkdownGenerator.MSBuild.Test\PxtlCa.XmlCommentMarkDownGenerator.MSBuild.Test.csproj", "{2358183D-B57C-467D-B89C-16C6BE040753}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,5 +46,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A014701D-154B-48B7-A856-5A277F53116D}
 	EndGlobalSection
 EndGlobal

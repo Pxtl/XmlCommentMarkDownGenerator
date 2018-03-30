@@ -57,7 +57,9 @@
     <Compile Include="ElementTests.cs" />
     <Compile Include="Regression.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestUtil.cs" />
+    <Compile Include="UnexpectedElement.cs" />
+    <Compile Include="Util\Helper.cs" />
+    <Compile Include="Util\TestWarningLogger.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="RegressionBigVariant_input.xml" />

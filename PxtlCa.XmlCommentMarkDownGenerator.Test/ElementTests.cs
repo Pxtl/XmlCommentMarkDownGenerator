@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using PxtlCa.XmlCommentMarkDownGenerator.Test.Util;
 using System.Text.RegularExpressions;
 
 namespace PxtlCa.XmlCommentMarkDownGenerator.Test
@@ -59,7 +60,7 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.Test
         {
             var inputResourceName = "PxtlCa.XmlCommentMarkDownGenerator.Test.ElementPara_input.xml";
             Regex normalizeSpace = new Regex(@"\s+", RegexOptions.Compiled);
-            var testInput = TestUtil.FetchResourceAsString(inputResourceName);
+            var testInput = Helper.FetchResourceAsString(inputResourceName);
 
             var testOutput = normalizeSpace.Replace(testInput.ToMarkDown(), " ");
             //TODO: better test here
@@ -70,7 +71,7 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.Test
         {
             var inputResourceName = "PxtlCa.XmlCommentMarkDownGenerator.Test.ElementC_input.xml";
             Regex normalizeSpace = new Regex(@"\s+", RegexOptions.Compiled);
-            var testInput = TestUtil.FetchResourceAsString(inputResourceName);
+            var testInput = Helper.FetchResourceAsString(inputResourceName);
 
             var testOutput = normalizeSpace.Replace(testInput.ToMarkDown(), " ");
             Assert.IsTrue(testOutput.Contains("`code tag c`"));
@@ -81,7 +82,7 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.Test
         {
             var inputResourceName = "PxtlCa.XmlCommentMarkDownGenerator.Test.ElementParam_input.xml";
             Regex normalizeSpace = new Regex(@"\s+", RegexOptions.Compiled);
-            var testInput = TestUtil.FetchResourceAsString(inputResourceName);
+            var testInput = Helper.FetchResourceAsString(inputResourceName);
 
             var testOutput = normalizeSpace.Replace(testInput.ToMarkDown(), " ");
         }
