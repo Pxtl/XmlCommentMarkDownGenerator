@@ -1,12 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9CB54D49-0D43-462C-B250-38BEB7F38312}"
 	ProjectSection(SolutionItems) = preProject
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
+		CONTRIB.txt = CONTRIB.txt
 		LICENSE.txt = LICENSE.txt
 		PxtlCa.XmlCommentMarkDownGenerator.nuspec = PxtlCa.XmlCommentMarkDownGenerator.nuspec
 		PxtlCa.XmlCommentMarkDownGenerator.targets = PxtlCa.XmlCommentMarkDownGenerator.targets
@@ -16,6 +17,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PxtlCa.XmlCommentMarkDownGenerator", "PxtlCa.XmlCommentMarkDownGenerator\PxtlCa.XmlCommentMarkDownGenerator.csproj", "{1375DC94-03F8-496C-981C-D5D6E1B0FD26}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PxtlCa.XmlCommentMarkDownGenerator.Test", "PxtlCa.XmlCommentMarkDownGenerator.Test\PxtlCa.XmlCommentMarkDownGenerator.Test.csproj", "{7993D07F-7F81-477E-ABA1-E3E6DC5CAB6A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PxtlCa.XmlCommentMarkDownGenerator.MSBuild", "PxtlCa.XmlCommentMarkDownGenerator.MSBuild\PxtlCa.XmlCommentMarkDownGenerator.MSBuild.csproj", "{9FCEE209-508F-474E-80C2-D0966E4AA126}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PxtlCa.XmlCommentMarkDownGenerator.MSBuild.Test", "PxtlCa.XmlCommentMarkdownGenerator.MSBuild.Test\PxtlCa.XmlCommentMarkDownGenerator.MSBuild.Test.csproj", "{2358183D-B57C-467D-B89C-16C6BE040753}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,8 +36,19 @@ Global
 		{7993D07F-7F81-477E-ABA1-E3E6DC5CAB6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7993D07F-7F81-477E-ABA1-E3E6DC5CAB6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7993D07F-7F81-477E-ABA1-E3E6DC5CAB6A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9FCEE209-508F-474E-80C2-D0966E4AA126}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9FCEE209-508F-474E-80C2-D0966E4AA126}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9FCEE209-508F-474E-80C2-D0966E4AA126}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9FCEE209-508F-474E-80C2-D0966E4AA126}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2358183D-B57C-467D-B89C-16C6BE040753}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2358183D-B57C-467D-B89C-16C6BE040753}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2358183D-B57C-467D-B89C-16C6BE040753}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2358183D-B57C-467D-B89C-16C6BE040753}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A014701D-154B-48B7-A856-5A277F53116D}
 	EndGlobalSection
 EndGlobal

@@ -1,0 +1,30 @@
+Contributing
+This is a side-project by Martin Zarate (aka Pxtl), and so any contributions in the form 
+of bug reports and fixes are appreciated.  Realistically, as a side-project with very 
+limited developer hours, the most effective way to fix a bug is to develop a fix yourself
+and pull-request it into the project for others to use.
+
+Issues
+
+Bugs or anomalies in the behavior of this program, issues with its installation, requests 
+for changes in documentation, design and development issues, and feature requests will 
+be tracked via GitHub's Issues mechanism.
+
+When reporting a bug, please provide the following info if appropriate:
+    What are the steps to reproduce the bug?  If possible, the simplest such set of steps 
+        is best.
+    Does the bug still happen using the latest version?
+    What PxtlCa.XmlCommentMarkDownGenerator version and OS are you using?
+
+Submitting a Pull Request
+
+Pull Requests are welcome, however code-quality will be maintained.  While project grew 
+out of a code snippet that used a somewhat unusual pattern and code quality is as such 
+somewhat low, it will not be allowed to get worse.  Code will be nitpicked, and large 
+rewrites or huge features dumped in all at once will likely be blocked.
+
+License
+
+PxtlCa.XmlCommentMarkDownGenerator is licensed under the terms in LICENSE.
+By contributing to the project, you agree to the terms of the license and to release your 
+contribution under those terms.

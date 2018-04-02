@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <UsingTask TaskName="GenerateMarkdown" AssemblyFile="$(MSBuildThisFileDirectory)\..\Tools\PxtlCa.XmlCommentMarkDownGenerator.MSBuild.dll" />
   <Target Name="AfterBuild">
     <Warning
       Condition="!Exists('$(MSBuildProjectDirectory)\$(OutputPath)\$(AssemblyName).xml')"
       Text="PxtlCa.XmlCommentMarkDownGenerator can't generate Markdown: Can't find Xml file matching assembly name.  Please confirm that your project file is configured to output the Xml documentation file in this build configuration."
       File="$(MSBuildProjectDirectory)\$(OutputPath)\$(AssemblyName).xml"
     />
-    <MakeDir Directories="$(MSBuildProjectDirectory)\..\Docs" />
-    <Exec
-      Command='"$(MSBuildThisFileDirectory)\..\Tools\PxtlCa.XmlCommentMarkDownGenerator.exe" -i "$(MSBuildProjectDirectory)\$(OutputPath)\$(AssemblyName).xml" -o "$(MSBuildProjectDirectory)\..\Docs\$(AssemblyName).GeneratedXmlDoc.md"'
-      Condition="Exists('$(MSBuildProjectDirectory)\$(OutputPath)\$(AssemblyName).xml')"
-    />
-    <Message
-      Importance="high" 
-      Text="PxtlCa.XmlCommentMarkDownGenerator created file: $(MSBuildProjectDirectory)\..\Docs\$(AssemblyName).GeneratedXmlDoc.md"
-      Condition="Exists('$(MSBuildProjectDirectory)\$(OutputPath)\$(AssemblyName).xml')"
+    <GenerateMarkdown 
+      InputXml="$(MSBuildProjectDirectory)\$(OutputPath)\$(AssemblyName).xml"
+      SourceDocumentDirPath="$(MSBuildProjectDirectory)"
+      TargetDocumentDirPath="$(MSBuildProjectDirectory)\..\Docs"
+      MergeFiles="true"
+      UnexpectedTagAction="warning"
+      OutputFile="$(MSBuildProjectDirectory)\Readme.md"
     />
   </Target>
 </Project>

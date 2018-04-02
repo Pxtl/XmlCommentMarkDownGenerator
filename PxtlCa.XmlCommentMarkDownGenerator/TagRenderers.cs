@@ -6,7 +6,7 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
 {
     public class TagRenderer
     {
-        public TagRenderer(string formatString, Func<XElement, string, IEnumerable<string>> valueExtractor)
+        public TagRenderer(string formatString, Func<XElement, ConversionContext, IEnumerable<string>> valueExtractor)
         {
             FormatString = formatString;
             ValueExtractor = valueExtractor;
@@ -16,7 +16,7 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
 
         public Func<
             XElement, //xml Element to extract from 
-            string, //assembly name
+            ConversionContext, //context
             IEnumerable<string> //resultant list of values that will get used with formatString
         > ValueExtractor;
 
@@ -24,94 +24,94 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
         {
             ["doc"] = new TagRenderer(
                 "# {0} #\n\n{1}\n\n",
-                (x, assemblyName) => new[]{
+                (x, context) => new[]{
                         x.Element("assembly").Element("name").Value,
-                        x.Element("members").Elements("member").ToMarkDown(x.Element("assembly").Element("name").Value)
+                        x.Element("members").Elements("member").ToMarkDown(context.MutateAssemblyName(x.Element("assembly").Element("name").Value))
                 }
             ),
             ["type"] = new TagRenderer(
                 "## {0}\n\n{1}\n\n---\n",
-                (x, assemblyName) => XmlToMarkdown.ExtractNameAndBodyFromMember(x, assemblyName)
+                (x, context) => XmlToMarkdown.ExtractNameAndBodyFromMember(x, context)
             ),
             ["field"] = new TagRenderer(
                 "#### {0}\n\n{1}\n\n---\n",
-                (x, assemblyName) => XmlToMarkdown.ExtractNameAndBodyFromMember(x, assemblyName)
+                (x, context) => XmlToMarkdown.ExtractNameAndBodyFromMember(x, context)
             ),
             ["property"] = new TagRenderer(
                 "#### {0}\n\n{1}\n\n---\n",
-                (x, assemblyName) => XmlToMarkdown.ExtractNameAndBodyFromMember(x, assemblyName)
+                (x, context) => XmlToMarkdown.ExtractNameAndBodyFromMember(x, context)
             ),
             ["method"] = new TagRenderer(
                 "#### {0}\n\n{1}\n\n---\n",
-                (x, assemblyName) => XmlToMarkdown.ExtractNameAndBodyFromMember(x, assemblyName)
+                (x, context) => XmlToMarkdown.ExtractNameAndBodyFromMember(x, context)
             ),
             ["event"] = new TagRenderer(
                 "#### {0}\n\n{1}\n\n---\n",
-                (x, assemblyName) => XmlToMarkdown.ExtractNameAndBodyFromMember(x, assemblyName)
+                (x, context) => XmlToMarkdown.ExtractNameAndBodyFromMember(x, context)
             ),
             ["summary"] = new TagRenderer(
                 "{0}\n\n",
-                (x, assemblyName) => new[] { x.Nodes().ToMarkDown(assemblyName) }
+                (x, context) => new[] { x.Nodes().ToMarkDown(context) }
             ),
             ["value"] = new TagRenderer(
                 "**Value**: {0}\n\n",
-                (x, assemblyName) => new[] { x.Nodes().ToMarkDown(assemblyName) }
+                (x, context) => new[] { x.Nodes().ToMarkDown(context) }
             ),
             ["remarks"] = new TagRenderer(
                 "\n\n>{0}\n\n",
-                (x, assemblyName) => new[] { x.Nodes().ToMarkDown(assemblyName) }
+                (x, context) => new[] { x.Nodes().ToMarkDown(context) }
             ),
             ["example"] = new TagRenderer(
                 "##### Example: {0}\n\n",
-                (x, assemblyName) => new[] { x.Nodes().ToMarkDown(assemblyName) }
+                (x, context) => new[] { x.Nodes().ToMarkDown(context) }
             ),
             ["para"] = new TagRenderer(
                 "{0}\n\n",
-                (x, assemblyName) => new[] { x.Nodes().ToMarkDown(assemblyName) }
+                (x, context) => new[] { x.Nodes().ToMarkDown(context) }
             ),
             ["code"] = new TagRenderer(
                 "\n\n###### {0} code\n\n```\n{1}\n```\n\n",
-                (x, assemblyName) => new[] { x.Attribute("lang")?.Value ?? "", x.Value.ToCodeBlock() }
+                (x, context) => new[] { x.Attribute("lang")?.Value ?? "", x.Value.ToCodeBlock() }
             ),
             ["seePage"] = new TagRenderer(
                 "[[{1}|{0}]]",
-                (x, assemblyName) => XmlToMarkdown.ExtractNameAndBody("cref", x, assemblyName)
+                (x, context) => XmlToMarkdown.ExtractNameAndBody("cref", x, context)
             ),
             ["seeAnchor"] = new TagRenderer(
                 "[{1}]({0})]",
-                (x, assemblyName) => { var xx = XmlToMarkdown.ExtractNameAndBody("cref", x, assemblyName); xx[0] = xx[0].ToLower(); return xx; }
+                (x, context) => { var xx = XmlToMarkdown.ExtractNameAndBody("cref", x, context); xx[0] = xx[0].ToLower(); return xx; }
             ),
             ["firstparam"] = new TagRenderer(
                 "|Name | Description |\n|-----|------|\n|{0}: |{1}|\n",
-                (x, assemblyName) => XmlToMarkdown.ExtractNameAndBody("name", x, assemblyName)
+                (x, context) => XmlToMarkdown.ExtractNameAndBody("name", x, context)
             ),
             ["typeparam"] = new TagRenderer(
                 "|{0}: |{1}|\n",
-                (x, assemblyName) => XmlToMarkdown.ExtractNameAndBody("name", x, assemblyName)
+                (x, context) => XmlToMarkdown.ExtractNameAndBody("name", x, context)
             ),
             ["param"] = new TagRenderer(
                 "|{0}: |{1}|\n",
-                (x, assemblyName) => XmlToMarkdown.ExtractNameAndBody("name", x, assemblyName)
+                (x, context) => XmlToMarkdown.ExtractNameAndBody("name", x, context)
             ),
             ["paramref"] = new TagRenderer(
                 "`{0}`",
-                (x, assemblyName) => XmlToMarkdown.ExtractNameAndBody("name", x, assemblyName)
+                (x, context) => XmlToMarkdown.ExtractNameAndBody("name", x, context)
             ),
             ["exception"] = new TagRenderer(
                 "[[{0}|{0}]]: {1}\n\n",
-                (x, assemblyName) => XmlToMarkdown.ExtractNameAndBody("cref", x, assemblyName)
+                (x, context) => XmlToMarkdown.ExtractNameAndBody("cref", x, context)
             ),
             ["returns"] = new TagRenderer(
                 "**Returns**: {0}\n\n",
-                (x, assemblyName) => new[] { x.Nodes().ToMarkDown(assemblyName) }
+                (x, context) => new[] { x.Nodes().ToMarkDown(context) }
             ),
             ["c"] = new TagRenderer(
                 " `{0}` ",
-                (x, assemblyName) => new[] { x.Nodes().ToMarkDown(assemblyName) }
+                (x, context) => new[] { x.Nodes().ToMarkDown(context) }
             ),
             ["none"] = new TagRenderer(
                 "",
-                (x, assemblyName) => new string[0]
+                (x, context) => new string[0]
             ),
         };
     }

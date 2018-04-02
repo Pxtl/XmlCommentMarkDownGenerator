@@ -3,7 +3,7 @@ using CommandLine.Text;
 
 namespace PxtlCa.XmlCommentMarkDownGenerator
 {
-    class Options
+    public class Options
     {
         [Option('i', "inputfile", HelpText = "Input xml file to read.")]
         public string InputFile { get; set; }
@@ -16,6 +16,9 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
 
         [Option("cout", HelpText = "Write output to console instead of file.")]
         public bool ConsoleOut { get; set; }
+
+        [Option('u', "unexpected", HelpText = "Handled unexpected tags as " + nameof(UnexpectedTagActionEnum.Accept) + ", " + nameof(UnexpectedTagActionEnum.Warn) + ", or " + nameof(UnexpectedTagActionEnum.Error) + ".")]
+        public UnexpectedTagActionEnum UnexpectedTagAction { get; set; }
 
         //[Option('v', null, HelpText = "Print details during execution.")]
         //public bool Verbose { get; set; }
