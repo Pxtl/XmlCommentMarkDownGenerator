@@ -15,13 +15,8 @@ using System.Linq;
 namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild.Test
 {
     [TestClass]
-    public class BuildEngine
+    public class TestMerges
     {
-        [TestMethod]
-        public void GetRegressionString()
-        {
-        }
-
         [TestMethod]
         public void ExecuteDefaultMerge()
         {
@@ -55,7 +50,6 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild.Test
         }
 
         [TestMethod]
-        [DeploymentItem("Docs")]
         public void HandleUnexpectedTag()
         {
             PrepareStandardInputDocsDirectory();
@@ -83,16 +77,10 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild.Test
             {
                 throw task.LoggedException;
             }
-
-            var expectFileExists = true;
-            //var fileActuallyExists = System.IO.File.Exists();
-
-            //Assert.AreEqual(expectFileExists, fileActuallyExists);
         }
 
 
         [TestMethod]
-        [DeploymentItem("Docs")]
         [ExpectedException(typeof(XmlException))]
         public void ExpectedErrorUnexpectedTag()
         {
