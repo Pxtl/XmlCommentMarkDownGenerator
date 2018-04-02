@@ -56,49 +56,6 @@ namespace PxtlCa.XmlCommentMarkDownGenerator.MSBuild.Test
 
         [TestMethod]
         [DeploymentItem("Docs")]
-        public void TestAvertMerge()
-        {
-            PrepareInputDocsDirectory("Notes", @"
----
-UnexpectedTagAction: None
----
-## No Documentation Yet Authored
-");
-            var mockRepo = new MockRepository();
-            var buildEngine = mockRepo.Stub<IBuildEngine>();
-
-            var inputPath = @"..\..\..\PxtlCa.XmlCommentMarkDownGenerator.MSBuild\bin\Debug\PxtlCa.XmlCommentMarkDownGenerator.MSBuild.xml";
-            var docPath = @"Docs";
-            var outputFile = new TaskItem(@"..\..\Readme.md");
-
-
-            var inputXml = new ITaskItem[] { new TaskItem(inputPath) };
-            var documentPath = new TaskItem(docPath);
-
-            var task = new GenerateMarkdown
-            {
-                BuildEngine = buildEngine,
-                TargetDocumentDirPath = documentPath,
-                InputXml = inputXml
-            };
-
-            task.Execute();
-
-            var expectFileExists = true;
-            var fileActuallyExists = System.IO.File.Exists(outputFile.ItemSpec);
-
-            Assert.AreEqual(expectFileExists, fileActuallyExists);
-
-            var docCount = Directory.EnumerateFiles(@"Docs", "*.md", SearchOption.TopDirectoryOnly).ToList().Count;
-
-            //different than the case where the files are merged (into _one_ file)
-            var expectedDocCount = 2;
-
-            Assert.AreEqual(expectedDocCount, docCount);
-        }
-
-        [TestMethod]
-        [DeploymentItem("Docs")]
         public void HandleUnexpectedTag()
         {
             PrepareStandardInputDocsDirectory();
