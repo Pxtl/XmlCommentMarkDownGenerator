@@ -29,6 +29,14 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
                         x.Element("members").Elements("member").ToMarkDown(context.MutateAssemblyName(x.Element("assembly").Element("name").Value))
                 }
             ),
+            ["br"] = new TagRenderer(
+                "\n",
+                (x, context) => new string[0]
+            ),
+            ["seealso"] = new TagRenderer(
+                "##### See also: {0}\n",
+                (x, context) => XmlToMarkdown.ExtractNameAndBody("cref", x, context)
+            ),
             ["type"] = new TagRenderer(
                 "## {0}\n\n{1}\n\n---\n",
                 (x, context) => XmlToMarkdown.ExtractNameAndBodyFromMember(x, context)
