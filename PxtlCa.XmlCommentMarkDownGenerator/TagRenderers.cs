@@ -34,8 +34,8 @@ namespace PxtlCa.XmlCommentMarkDownGenerator
                 (x, context) => new string[0]
             ),
             ["seealso"] = new TagRenderer(
-                "## \n\n",
-                (x, context) => new[] { x.Nodes().ToMarkDown(context) }
+                "##### See also: {0}\n",
+                (x, context) => XmlToMarkdown.ExtractNameAndBody("cref", x, context)
             ),
             ["type"] = new TagRenderer(
                 "## {0}\n\n{1}\n\n---\n",
